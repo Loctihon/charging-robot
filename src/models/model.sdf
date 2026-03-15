@@ -1,0 +1,100 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="tram_sac_VF">
+    <static>true</static>
+    <link name="body_link">
+      
+      <visual name="visual_tru">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://tram_sac_VF/meshes/tru.stl</uri>
+            <scale>0.001 0.001 0.001</scale> </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/White</name>
+          </script>
+        </material>
+      </visual>
+
+      <visual name="visual_cong_sac">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://tram_sac_VF/meshes/cong_sac.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Gold</name>
+          </script>
+        </material>
+      </visual>
+
+      <visual name="visual_logo">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://tram_sac_VF/meshes/Logo_VF.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Blue</name>
+          </script>
+        </material>
+      </visual>
+
+      <visual name="visual_icon">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://tram_sac_VF/meshes/icon.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Green</name>
+          </script>
+        </material>
+      </visual>
+
+      <collision name="collision_tru">
+        <pose>0 0.1 0.45 0 0 0</pose> 
+        <geometry>
+          <box>
+            <size>0.32 0.15 0.92</size> 
+          </box>
+        </geometry>
+      </collision>
+
+      <collision name="collision_cong_sac">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://tram_sac_VF/meshes/cong_sac.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <max_contacts>10</max_contacts>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1.0</mu>
+              <mu2>1.0</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+
+    </link>
+  </model>
+</sdf>
