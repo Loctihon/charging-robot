@@ -1,0 +1,147 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100
+    use_sim_time: true
+
+    speed_scaling_state_broadcaster:
+      type: ur_controllers/SpeedScalingStateBroadcaster
+
+    force_torque_sensor_broadcaster:
+      type: ur_controllers/ForceTorqueStateBroadcaster
+
+    scaled_joint_trajectory_controller:
+      type: ur_controllers/ScaledJointTrajectoryController
+
+    forward_velocity_controller:
+      type: velocity_controllers/JointGroupVelocityController
+
+    forward_position_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    steering_controller:
+      type: position_controllers/JointGroupPositionController
+
+    drive_controller:
+      type: velocity_controllers/JointGroupVelocityController
+
+    joint_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+steering_controller:
+  ros__parameters:
+    joints:
+      - Revolute1_to_base_link
+      - Revolute2_to_base_link
+      - Revolute3_to_base_link 
+      - Revolute4_to_base_link
+
+drive_controller:
+  ros__parameters:
+    joints:
+      - Wheel1_to_Revolute1
+      - Wheel2_to_Revolute2
+      - Wheel3_to_Revolute3
+      - Wheel4_to_Revolute4
+
+joint_trajectory_controller:
+  ros__parameters:
+    joints:
+      - ur10_shoulder_pan_joint
+      - ur10_shoulder_lift_joint
+      - ur10_elbow_joint
+      - ur10_wrist_1_joint 
+      - ur10_wrist_2_joint 
+      - ur10_wrist_3_joint
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    state_publish_rate: 100.0
+    action_monitor_rate: 20.0
+    allow_partial_joints_goal: false
+    constraints:
+      stopped_velocity_tolerance: 0.2
+      goal_time: 0.0
+      shoulder_pan_joint: { trajectory: 0.2, goal: 0.1 }
+      shoulder_lift_joint: { trajectory: 0.2, goal: 0.1 }
+      elbow_joint: { trajectory: 0.2, goal: 0.1 }
+      wrist_1_joint: { trajectory: 0.2, goal: 0.1 }
+      wrist_2_joint: { trajectory: 0.2, goal: 0.1 }
+      wrist_3_joint: { trajectory: 0.2, goal: 0.1 }
+
+  # gains:
+  #     shoulder_pan_joint: {p: 1000.0, i: 0.0, d: 10.0}
+  #     shoulder_lift_joint: {p: 5000.0, i: 0.0, d: 20.0} 
+  #     elbow_joint: {p: 2000.0, i: 0.0, d: 20.0}
+  #     wrist_1_joint: {p: 500.0, i: 0.0, d: 1.0}
+  #     wrist_2_joint: {p: 500.0, i: 0.0, d: 1.0}
+  #     wrist_3_joint: {p: 100.0, i: 0.0, d: 0.1}
+# File này để kết hợp bộ điều khiển của thân xe lẫn cánh tay ur10
+
+speed_scaling_state_broadcaster:
+  ros__parameters:
+    state_publish_rate: 100.0
+
+force_torque_sensor_broadcaster:
+  ros__parameters:
+    sensor_name: tcp_fts_sensor
+    state_interface_names:
+      - force.x
+      - force.y
+      - force.z
+      - torque.x
+      - torque.y
+      - torque.z
+    frame_id: tool0
+    topic_name: ft_data
+
+scaled_joint_trajectory_controller:
+  ros__parameters:
+    joints:
+      - ur10_shoulder_pan_joint
+      - ur10_shoulder_lift_joint
+      - ur10_elbow_joint
+      - ur10_wrist_1_joint
+      - ur10_wrist_2_joint
+      - ur10_wrist_3_joint
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    state_publish_rate: 100.0
+    action_monitor_rate: 20.0
+    allow_partial_joints_goal: false
+    constraints:
+      stopped_velocity_tolerance: 0.2
+      goal_time: 0.0
+      shoulder_pan_joint: { trajectory: 0.2, goal: 0.1 }
+      shoulder_lift_joint: { trajectory: 0.2, goal: 0.1 }
+      elbow_joint: { trajectory: 0.2, goal: 0.1 }
+      wrist_1_joint: { trajectory: 0.2, goal: 0.1 }
+      wrist_2_joint: { trajectory: 0.2, goal: 0.1 }
+      wrist_3_joint: { trajectory: 0.2, goal: 0.1 }
+
+forward_velocity_controller:
+  ros__parameters:
+    joints:
+      - ur10_shoulder_pan_joint
+      - ur10_shoulder_lift_joint
+      - ur10_elbow_joint
+      - ur10_wrist_1_joint
+      - ur10_wrist_2_joint
+      - ur10_wrist_3_joint
+    interface_name: velocity
+
+forward_position_controller:
+  ros__parameters:
+    joints:
+      - ur10_shoulder_pan_joint
+      - ur10_shoulder_lift_joint
+      - ur10_elbow_joint
+      - ur10_wrist_1_join
+

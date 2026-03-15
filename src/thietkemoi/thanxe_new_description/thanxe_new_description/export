@@ -1,0 +1,1 @@
+export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/home/loc/new_design_ws/src/models

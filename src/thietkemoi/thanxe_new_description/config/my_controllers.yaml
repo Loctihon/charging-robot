@@ -1,0 +1,30 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 50
+    use_sim_time: true
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    steering_controller:
+      type: position_controllers/JointGroupPositionController
+
+    drive_controller:
+      type: velocity_controllers/JointGroupVelocityController
+
+steering_controller:
+  ros__parameters:
+    joints:
+      - Revolute1_to_base_link
+      - Revolute2_to_base_link
+      - Revolute3_to_base_link 
+      - Revolute4_to_base_link
+
+drive_controller:
+  ros__parameters:
+    joints:
+      - Wheel1_to_Revolute1
+      - Wheel2_to_Revolute2
+      - Wheel3_to_Revolute3
+      - Wheel4_to_Revolute4
+# File này chỉ là controller cho thân xe 

@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <ros2_control name="GazeboSystem" type="system">
+        <hardware>
+            <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+        </hardware>
+
+        <joint name="Revolute1_to_base_link">
+            <command_interface name="position">
+                <param name="min">-3.14</param>
+                <param name="max">3.14</param>
+            </command_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="position"/>
+        </joint>
+
+        <joint name="Revolute2_to_base_link">
+            <command_interface name="position">
+                <param name="min">-3.14</param>
+                <param name="max">3.14</param>
+            </command_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="position"/>
+        </joint>
+
+        <joint name="Revolute3_to_base_link">
+            <command_interface name="position">
+                <param name="min">-3.14</param>
+                <param name="max">3.14</param>
+            </command_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="position"/>
+        </joint>
+
+        <joint name="Revolute4_to_base_link">
+            <command_interface name="position">
+                <param name="min">-3.14</param>
+                <param name="max">3.14</param>
+            </command_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="position"/>
+        </joint>
+        
+        <joint name="Wheel1_to_Revolute1">
+            <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="position"/>
+        </joint>
+
+        <joint name="Wheel2_to_Revolute2">
+            <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="position"/>
+        </joint>
+
+        <joint name="Wheel3_to_Revolute3">
+            <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="position"/>
+        </joint>
+
+        <joint name="Wheel4_to_Revolute4">
+            <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="position"/>
+        </joint>
+
+    </ros2_control>
+<!-- Nếu muốn điều khiển riêng thân xe thì bỏ comment các dòng bên dứoi và ngược lại điều khiển kết hợp thì comment điều khiển thân xe-->
+    <!-- <gazebo>
+        <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+            <parameters>$(find thanxe_new_description)/config/my_controllers.yaml</parameters>
+        </plugin>
+    </gazebo> --> 
+
+    <!-- <gazebo>
+        <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+            <parameters>$(find thanxe_new_description)/config/combine_controller.yaml</parameters>
+        </plugin>
+    </gazebo> -->
+
+</robot>
