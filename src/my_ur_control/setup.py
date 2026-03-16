@@ -26,8 +26,8 @@ setup(
         'console_scripts': [
             # 'donghocnghich = my_ur_control.arm_commander:main',
             # 'donghocnghich = my_ur_control.only_arm_commander:main',
-            'donghocnghich = my_ur_control.step_by_step:main',
-            'donghocthuan = my_ur_control.DH_Thuan:main'
+            'donghocnghich = my_ur_control.donghocnghich:main',
+            'donghocthuan = my_ur_control.DH_Thuan:main',
 
         ],
     },

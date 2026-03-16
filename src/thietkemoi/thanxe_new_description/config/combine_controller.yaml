@@ -73,14 +73,16 @@ joint_trajectory_controller:
       wrist_2_joint: { trajectory: 0.2, goal: 0.1 }
       wrist_3_joint: { trajectory: 0.2, goal: 0.1 }
 
-  # gains:
-  #     shoulder_pan_joint: {p: 1000.0, i: 0.0, d: 10.0}
-  #     shoulder_lift_joint: {p: 5000.0, i: 0.0, d: 20.0} 
-  #     elbow_joint: {p: 2000.0, i: 0.0, d: 20.0}
-  #     wrist_1_joint: {p: 500.0, i: 0.0, d: 1.0}
-  #     wrist_2_joint: {p: 500.0, i: 0.0, d: 1.0}
-  #     wrist_3_joint: {p: 100.0, i: 0.0, d: 0.1}
-# File này để kết hợp bộ điều khiển của thân xe lẫn cánh tay ur10
+    gains:
+        ur10_shoulder_pan_joint: {p: 10000.0, i: 1.0, d: 10.0}
+        
+        ur10_shoulder_lift_joint: {p: 20000.0, i: 50.0, d: 20.0} 
+        
+        ur10_elbow_joint: {p: 10000.0, i: 20.0, d: 20.0}
+
+        ur10_wrist_1_joint: {p: 1000.0, i: 1.0, d: 1.0}
+        ur10_wrist_2_joint: {p: 1000.0, i: 1.0, d: 1.0}
+        ur10_wrist_3_joint: {p: 500.0, i: 0.1, d: 0.1}
 
 speed_scaling_state_broadcaster:
   ros__parameters:

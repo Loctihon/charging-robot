@@ -41,7 +41,7 @@
     </visual>
     <collision>
         <geometry>
-        <mesh filename="file://$(find thanxe_new_description)/meshes/dausac.stl" scale="0.0009 0.0009 0.0009"/>
+        <mesh filename="file://$(find thanxe_new_description)/meshes/dausac.stl" scale="0.00099 0.00099 0.00099"/>
         </geometry>
     </collision>
     </link>

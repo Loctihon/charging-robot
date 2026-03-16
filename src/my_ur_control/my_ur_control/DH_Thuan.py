@@ -5,7 +5,7 @@ import numpy as np
 import math
 import sys
 
-d = [0.1273, 0, 0, 0.163941, 0.1157, 0.0922]
+d = [0.1273, 0, 0, 0.1639, 0.1157, 0.0922]
 a = [0, -0.612, -0.5723, 0, 0, 0]
 alph = [math.pi/2, 0, 0, math.pi/2, -math.pi/2, 0]
 
