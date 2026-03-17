@@ -95,7 +95,7 @@
         <pose>0 0.005 0 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://tram_sac_VF/meshes/cong_sac.stl</uri>
+            <uri>model://tram_sac_VF/meshes/tramsac.stl</uri>
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>
