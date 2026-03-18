@@ -174,12 +174,12 @@ def generate_launch_description():
 
 
     return LaunchDescription([
+        set_gazebo_model_path,
         gazebo,
         node_robot_state_publisher,
         node_spawn_entity,
         load_joint_state_broadcaster,
         load_base_controllers,
-        set_gazebo_model_path,
         node_spawn_station,
         node_spawn_station2,
         node_spawn_station3,
