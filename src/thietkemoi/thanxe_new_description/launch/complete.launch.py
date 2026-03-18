@@ -120,9 +120,16 @@ def generate_launch_description():
     
     node_swerve_drive = Node(
         package=pkg_name,
-        executable='swerve_drive', 
+        executable='swerve_drive',
         output='screen',
         parameters=[{'use_sim_time': True}] # Ép Sim Time về True tại đây
+    )
+
+    node_depth_heatmap = Node(
+        package=pkg_name,
+        executable='depth_heatmap',
+        output='screen',
+        parameters=[{'use_sim_time': True}]
     )
     node_spawn_station = Node(
         package='gazebo_ros',
@@ -183,6 +190,7 @@ def generate_launch_description():
         node_spawn_station,
         node_spawn_station2,
         node_spawn_station3,
-        node_swerve_drive
+        node_swerve_drive,
+        node_depth_heatmap
 
     ])
