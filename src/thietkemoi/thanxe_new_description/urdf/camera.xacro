@@ -65,6 +65,8 @@
             </ros>
             <frame_name>${name}_link_optical</frame_name>
             <hack_baseline>0.07</hack_baseline>
+            <min_depth>${distance_min}</min_depth>
+            <max_depth>${distance_max}</max_depth>
           </plugin>
         </sensor>
     </gazebo>

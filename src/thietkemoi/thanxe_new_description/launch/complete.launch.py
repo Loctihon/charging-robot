@@ -131,6 +131,13 @@ def generate_launch_description():
         output='screen',
         parameters=[{'use_sim_time': True}]
     )
+
+    node_sovlepnp = Node(
+        package=pkg_name,
+        executable='sovlepnp',
+        output='screen',
+        parameters=[{'use_sim_time': True}]
+    )
     node_spawn_station = Node(
         package='gazebo_ros',
         executable='spawn_entity.py',
@@ -191,6 +198,7 @@ def generate_launch_description():
         node_spawn_station2,
         node_spawn_station3,
         node_swerve_drive,
-        node_depth_heatmap
+        node_depth_heatmap,
+        node_sovlepnp
 
     ])
