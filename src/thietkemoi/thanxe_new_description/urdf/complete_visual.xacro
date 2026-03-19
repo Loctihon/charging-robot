@@ -63,9 +63,9 @@
         name="base_camera" 
         parent="base_link" 
         xyz="0.88 0 0.85" 
-        rpy="0 0 0"
+        rpy="0 0.15 0"
         distance_min="0.01"
-        distance_max="200" />
+        distance_max="40" />
 
     <xacro:add_camera 
         name="arm_camera" 

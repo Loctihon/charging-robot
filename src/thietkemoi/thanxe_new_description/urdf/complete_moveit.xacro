@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="complete_visual">
+    
+    <xacro:include filename="moveit.xacro" />
+    <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro"/>    
+
+    <xacro:arg name="joint_limits_params" default="$(find ur_description)/config/ur10/joint_limits.yaml"/>
+    <xacro:arg name="kinematics_params" default="$(find ur_description)/config/ur10/default_kinematics.yaml"/>
+    <xacro:arg name="physical_params" default="$(find ur_description)/config/ur10/physical_parameters.yaml"/>
+    <xacro:arg name="visual_params" default="$(find ur_description)/config/ur10/visual_parameters.yaml"/>
+    <xacro:arg name="transmission_hw_interface" default="hardware_interface/PositionJointInterface"/>
+
+    <xacro:ur_robot
+        name="ur10" tf_prefix="ur10_" parent="base_link"
+        joint_limits_parameters_file="$(arg joint_limits_params)"
+        kinematics_parameters_file="$(arg kinematics_params)"
+        physical_parameters_file="$(arg physical_params)"
+        visual_parameters_file="$(arg visual_params)"
+        transmission_hw_interface="$(arg transmission_hw_interface)"
+        sim_gazebo = "false" 
+    >
+    <origin xyz="0.5 0 1.0" rpy="0 0 ${pi}" />
+    </xacro:ur_robot>
+
+    <link name="Charge_link"> 
+      <visual>
+            <geometry><box size="0.07 0.135 0.135" /></geometry>
+            <material name="gold"/>
+      </visual>
+      <collision>
+            <geometry><box size="0.07 0.135 0.135" /></geometry>
+      </collision>
+    </link>
+
+    <joint name="Charge_link_to_ur10_tool0" type="fixed"><origin xyz="0 0.0 0" rpy="0 ${pi} ${-pi}"/><parent link="ur10_tool0"/><child link="Charge_link"/></joint>
+    <link name="charging_tcp" />
+    <joint name="charge_to_tcp" type="fixed"><parent link="Charge_link"/><child link="charging_tcp"/><origin xyz="0.0 0.2022 -0.0812" rpy="0 0 0"/> </joint>
+</robot>
