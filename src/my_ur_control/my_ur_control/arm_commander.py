@@ -1,193 +1,280 @@
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import JointState
-from geometry_msgs.msg import Point
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+from sensor_msgs.msg import JointState
 import numpy as np
-import math
+from math import *
+import threading
 
-from my_ur_control import ur10_inverse_kin 
+# ================= DH PARAM =================
+d1 = 0.1273
+a2 = -0.612
+a3 = -0.5723
+d4 = 0.1639
+d5 = 0.1157
+d6 = 0.0922
 
-class ArmCommander(Node):
+a = [0, a2, a3, 0, 0, 0]
+d = [d1, 0, 0, d4, d5, d6]
+alph = [pi/2, 0, 0, pi/2, -pi/2, 0]
+
+# ================= KINEMATICS =================
+def ah(n, th, c):
+    T_a = np.identity(4)
+    T_a[0,3] = a[n-1]
+
+    T_d = np.identity(4)
+    T_d[2,3] = d[n-1]
+
+    Rzt = np.array([
+        [cos(th[n-1,c]), -sin(th[n-1,c]), 0, 0],
+        [sin(th[n-1,c]),  cos(th[n-1,c]), 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]
+    ])
+
+    Rxa = np.array([
+        [1, 0, 0, 0],
+        [0, cos(alph[n-1]), -sin(alph[n-1]), 0],
+        [0, sin(alph[n-1]),  cos(alph[n-1]), 0],
+        [0, 0, 0, 1]
+    ])
+
+    return T_d @ Rzt @ T_a @ Rxa
+
+
+def inverse_kinematics(T_06):
+    th = np.zeros((6, 8))
+
+    # theta1
+    P_05 = T_06 @ np.array([0,0,-d6,1])
+    psi = atan2(P_05[1], P_05[0])
+    r = sqrt(P_05[0]**2 + P_05[1]**2)
+
+    if r < d4: return []
+    phi = acos(d4 / r)
+
+    th[0,0:4] = pi/2 + psi + phi
+    th[0,4:8] = pi/2 + psi - phi
+
+    # theta5
+    for c in [0,4]:
+        T_10 = np.linalg.inv(ah(1,th,c))
+        T_16 = T_10 @ T_06
+        val = (T_16[2,3] - d4) / d6
+        val = np.clip(val, -1, 1)
+
+        th[4,c:c+2] = -acos(val)
+        th[4,c+2:c+4] = acos(val)
+
+    # theta6
+    for c in [0,2,4,6]:
+        if abs(sin(th[4,c])) < 1e-6: continue
+        T_10 = np.linalg.inv(ah(1,th,c))
+        T_16 = np.linalg.inv(T_10 @ T_06)
+
+        th[5,c:c+2] = atan2(
+            -T_16[1,2]/sin(th[4,c]),
+             T_16[0,2]/sin(th[4,c])
+        )
+
+    # theta3
+    for c in [0,2,4,6]:
+        T_10 = np.linalg.inv(ah(1,th,c))
+        T_65 = ah(6,th,c)
+        T_54 = ah(5,th,c)
+        T_14 = (T_10 @ T_06) @ np.linalg.inv(T_54 @ T_65)
+
+        P_13 = T_14 @ np.array([0,-d4,0,1])
+        P_13 = P_13[:3]
+
+        D = (P_13[0]**2 + P_13[1]**2 - a2**2 - a3**2) / (2*a2*a3)
+        D = np.clip(D, -1, 1)
+
+        th[2,c] = acos(D)
+        th[2,c+1] = -acos(D)
+
+    # theta2,4
+    for c in range(8):
+        T_10 = np.linalg.inv(ah(1,th,c))
+        T_65 = np.linalg.inv(ah(6,th,c))
+        T_54 = np.linalg.inv(ah(5,th,c))
+
+        T_14 = (T_10 @ T_06) @ T_65 @ T_54
+        P_13 = T_14 @ np.array([0,-d4,0,1])
+        P_13 = P_13[:3]
+
+        r = sqrt(P_13[0]**2 + P_13[1]**2)
+        if r < 1e-6: continue
+
+        val = a3*sin(th[2,c]) / r
+        val = np.clip(val, -1, 1)
+
+        th[1,c] = -atan2(P_13[1], -P_13[0]) + asin(val)
+
+        T_32 = np.linalg.inv(ah(3,th,c))
+        T_21 = np.linalg.inv(ah(2,th,c))
+        T_34 = T_32 @ T_21 @ T_14
+
+        th[3,c] = atan2(T_34[1,0], T_34[0,0])
+
+    return [th[:,i].tolist() for i in range(8)]
+
+
+def get_T(x,y,z,r,p,yaw):
+    Rx = np.array([
+        [1,0,0,0],
+        [0,cos(r),-sin(r),0],
+        [0,sin(r),cos(r),0],
+        [0,0,0,1]
+    ])
+    Ry = np.array([
+        [cos(p),0,sin(p),0],
+        [0,1,0,0],
+        [-sin(p),0,cos(p),0],
+        [0,0,0,1]
+    ])
+    Rz = np.array([
+        [cos(yaw),-sin(yaw),0,0],
+        [sin(yaw), cos(yaw),0,0],
+        [0,0,1,0],
+        [0,0,0,1]
+    ])
+
+    T = np.eye(4)
+    T[0,3],T[1,3],T[2,3] = x,y,z
+
+    return T @ Rz @ Ry @ Rx
+
+
+def calculate_fk(q):
+    T = np.eye(4)
+    for i in range(6):
+        ct, st = cos(q[i]), sin(q[i])
+        ca, sa = cos(alph[i]), sin(alph[i])
+
+        A = np.array([
+            [ct, -st*ca, st*sa, a[i]*ct],
+            [st,  ct*ca,-ct*sa, a[i]*st],
+            [0,   sa,    ca,    d[i]],
+            [0,   0,     0,     1]
+        ])
+        T = T @ A
+    return T
+
+# ================= NODE =================
+class ArmNode(Node):
     def __init__(self):
-        super().__init__('arm_commander')
+        super().__init__('ur10_safe_ik')
 
-        # --- KHỐI 1: TAI NGHE (Nhận lệnh X,Y,Z) ---
-        self.input_sub = self.create_subscription(
-            Point, 
-            '/goal_cmd', 
-            self.goal_callback, 
-            10
-        )
+        self.pub = self.create_publisher(
+            JointTrajectory,
+            '/joint_trajectory_controller/joint_trajectory',
+            10)
 
-        # --- KHỐI 2: MẮT THẦN (Biết robot đang ở đâu) ---
-        self.joint_state_sub = self.create_subscription(
-            JointState, 
-            '/joint_states', 
-            self.joint_state_callback, 
-            10
-        )
-        self.current_joints = [0.0] * 6 # Lưu tạm vị trí hiện tại
+        self.sub = self.create_subscription(
+            JointState,
+            '/joint_states',
+            self.cb,
+            10)
 
-        # --- KHỐI 4: CÁI MIỆNG (Gửi lệnh đi) ---
-        self.traj_pub = self.create_publisher(
-            JointTrajectory, 
-            '/joint_trajectory_controller/joint_trajectory', 
-            10
-        )
-
-        self.get_logger().info("Arm Commander đã sẵn sàng! Gửi Point vào /goal_cmd đi!")
-
-    def joint_state_callback(self, msg):
-        if not hasattr(self, 'checked_names'):
-            self.get_logger().warn(f"Robot đang gửi về các khớp: {msg.name}")
-            self.checked_names = True
-
-        ur_joint_names = [
-            'ur10_shoulder_pan_joint', 'ur10_shoulder_lift_joint', 'ur10_elbow_joint',
-            'ur10_wrist_1_joint', 'ur10_wrist_2_joint', 'ur10_wrist_3_joint'
+        self.joint_names = [
+            'ur10_shoulder_pan_joint',
+            'ur10_shoulder_lift_joint',
+            'ur10_elbow_joint',
+            'ur10_wrist_1_joint',
+            'ur10_wrist_2_joint',
+            'ur10_wrist_3_joint'
         ]
+
+        self.current = None
+        self.max_delta = radians(20)
+
+        threading.Thread(target=self.loop, daemon=True).start()
+
+    def cb(self, msg):
+        m = dict(zip(msg.name, msg.position))
         try:
-            current_pos = []
-            for name in ur_joint_names:
-                if name in msg.name:
-                    index = msg.name.index(name)
-                    current_pos.append(msg.position[index])
-                else:
-                    return # Không cập nhật thêm
-            
-            self.current_joints = current_pos
-            
-        except ValueError:
+            self.current = np.array([m[j] for j in self.joint_names])
+        except:
             pass
 
-    # --- HÀM MỚI: ĐỘNG HỌC THUẬN (FK) ĐỂ KIỂM TRA ---
-    def calculate_fk(self, joints):
-        # Thông số DH của UR10 (Khớp với file IK của bạn)
-        d = [0.1273, 0, 0, 0.1639, 0.1157, 0.0922]
-        a = [0, -0.612, -0.5723, 0, 0, 0]
-        alph = [math.pi/2, 0, 0, math.pi/2, -math.pi/2, 0]
-        
-        # Ma trận biến đổi tổng
-        T = np.eye(4)
-        
-        for i in range(6):
-            theta = joints[i]
-            # Tạo ma trận biến đổi cho khớp thứ i
-            ct = math.cos(theta)
-            st = math.sin(theta)
-            ca = math.cos(alph[i])
-            sa = math.sin(alph[i])
-            
-            # Ma trận DH tiêu chuẩn (giống logic file IK của bạn)
-            # T_i = Rot_z * Trans_z * Trans_x * Rot_x
-            # Lưu ý: File IK của bạn dùng thứ tự: T_d * Rzt * T_a * Rxa
-            # Nên ta viết tường minh theo đúng logic đó:
-            
-            # 1. Rot_z(theta)
-            Rzt = np.array([
-                [ct, -st, 0, 0],
-                [st,  ct, 0, 0],
-                [0,    0, 1, 0],
-                [0,    0, 0, 1]
-            ])
-            # 2. Trans_z(d)
-            Td = np.array([
-                [1, 0, 0, 0],
-                [0, 1, 0, 0],
-                [0, 0, 1, d[i]],
-                [0, 0, 0, 1]
-            ])
-            # 3. Trans_x(a)
-            Ta = np.array([
-                [1, 0, 0, a[i]],
-                [0, 1, 0, 0],
-                [0, 0, 1, 0],
-                [0, 0, 0, 1]
-            ])
-            # 4. Rot_x(alpha)
-            Rxa = np.array([
-                [1, 0,   0, 0],
-                [0, ca, -sa, 0],
-                [0, sa,  ca, 0],
-                [0, 0,   0, 1]
-            ])
-            
-            # Nhân ma trận: A_i = Td * Rzt * Ta * Rxa
-            A_i = Td @ Rzt @ Ta @ Rxa
-            
-            # Nhân vào ma trận tổng
-            T = T @ A_i
-            
-        # Trả về tọa độ X, Y, Z
-        return T[0,3], T[1,3], T[2,3]
+    def norm(self, a):
+        return (a + pi) % (2*pi) - pi
 
-    # --- KHỐI 3: BỘ NÃO (Xử lý chính) ---
-    def goal_callback(self, msg):
-        target_x, target_y, target_z = msg.x, msg.y, msg.z
-        self.get_logger().info(f"--- NHẬN LỆNH MỚI ---")
-        self.get_logger().info(f"Mục tiêu (Target): x={target_x:.3f}, y={target_y:.3f}, z={target_z:.3f}")
-        
-        T = np.eye(4)
-        T[0,3] = target_x
-        T[1,3] = target_y
-        T[2,3] = target_z
-        
-        # 1. Giải IK
-        solutions = ur10_inverse_kin.inverse_kinematics(T) 
-        best_sol = self.find_closest_solution(solutions, self.current_joints)
+    def select(self, sols, x,y,z):
+        if self.current is None:
+            print("❌ No joint_state")
+            return None
 
-        if best_sol:
-            # 2. KIỂM TRA NGƯỢC LẠI BẰNG FK (Bổ sung mới)
-            # Tính xem với góc best_sol này, robot thực sự sẽ đi đến đâu
-            fk_x, fk_y, fk_z = self.calculate_fk(best_sol)
-            
-            self.get_logger().info("--- KẾT QUẢ KIỂM TRA (Verify IK) ---")
-            self.get_logger().warn(f"Nghiệm IK (Góc khớp): {[round(x,2) for x in best_sol]}")
-            self.get_logger().info(f"Tọa độ thực tế sẽ đạt tới (FK): x={fk_x:.3f}, y={fk_y:.3f}, z={fk_z:.3f}")
-            
-            # Tính sai số
-            error = math.sqrt((target_x-fk_x)**2 + (target_y-fk_y)**2 + (target_z-fk_z)**2)
-            self.get_logger().info(f"Sai số khoảng cách (Error): {error:.5f} m")
+        valid = []
 
-            max_jump = max([abs(s - c) for s, c in zip(best_sol, self.current_joints)])
-            
-            if max_jump > 3.14: 
-                self.get_logger().error("CẢNH BÁO: Robot đang định quay quá 180 độ!")
-            
-            self.send_command(best_sol)
-        else:
-            self.get_logger().error("Không tìm thấy nghiệm IK nào phù hợp!")
+        for sol in sols:
+            sol = np.array([self.norm(s) for s in sol])
 
-    def find_closest_solution(self, solutions, current_joints):
-        best_sol = None
-        min_diff = float('inf')
-        
-        for sol in solutions:
-            diff = sum([abs(s - c) for s, c in zip(sol, current_joints)])
-            if diff < min_diff:
-                min_diff = diff
-                best_sol = sol
-        return best_sol
+            delta = np.array([self.norm(sol[i]-self.current[i]) for i in range(6)])
+            if np.any(np.abs(delta) > self.max_delta):
+                continue
 
-    def send_command(self, joint_angles):
+            T = calculate_fk(sol)
+            err = np.linalg.norm(T[:3,3] - [x,y,z])
+
+            if err < 0.005:
+                valid.append(sol)
+
+        if not valid:
+            return None
+
+        best = min(valid, key=lambda s: np.linalg.norm(s-self.current))
+        return best
+
+    def loop(self):
+        while rclpy.ok():
+            try:
+                s = input(">>> X Y Z R P Y(deg): ")
+                v = list(map(float, s.split()))
+                if len(v)!=6: continue
+
+                x,y,z = v[:3]
+                r,p,yw = map(radians, v[3:])
+
+                T = get_T(x,y,z,r,p,yw)
+                sols = inverse_kinematics(T)
+
+                if not sols:
+                    print("❌ No IK")
+                    continue
+
+                q = self.select(sols,x,y,z)
+
+                if q is None:
+                    print("❌ Unsafe")
+                    continue
+
+                print("✅", [round(degrees(i),1) for i in q])
+                self.send(q)
+
+            except Exception as e:
+                print("ERR:", e)
+
+    def send(self, q):
         msg = JointTrajectory()
-        msg.joint_names = [
-            'ur10_shoulder_pan_joint', 'ur10_shoulder_lift_joint', 'ur10_elbow_joint',
-            'ur10_wrist_1_joint', 'ur10_wrist_2_joint', 'ur10_wrist_3_joint'
-        ]
-        
-        point = JointTrajectoryPoint()
-        point.positions = joint_angles
-        point.time_from_start.sec = 4 
-        
-        msg.points.append(point)
-        self.traj_pub.publish(msg)
-        self.get_logger().info("Đã gửi lệnh xuống Controller!")
+        msg.joint_names = self.joint_names
 
-def main(args=None):
-    rclpy.init(args=args)
-    node = ArmCommander()
+        pt = JointTrajectoryPoint()
+        pt.positions = q.tolist()
+        pt.time_from_start.sec = 2
+
+        msg.points.append(pt)
+        self.pub.publish(msg)
+
+
+def main():
+    rclpy.init()
+    node = ArmNode()
     rclpy.spin(node)
-    node.destroy_node()
     rclpy.shutdown()
+
+
+if __name__ == "__main__":
+    main()

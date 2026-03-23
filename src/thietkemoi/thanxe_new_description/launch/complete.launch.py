@@ -11,6 +11,7 @@ from launch.actions import AppendEnvironmentVariable
 
 def generate_launch_description():
     pkg_name = 'thanxe_new_description'
+    cpp_pkg_name = "my_ur_control_cpp"
 
     # Đường dẫn đến file Xacro gốc
     xacro_path = os.path.join(get_package_share_directory(pkg_name), 'urdf', 'complete_visual.xacro')
@@ -119,7 +120,7 @@ def generate_launch_description():
     )
     
     node_swerve_drive = Node(
-        package=pkg_name,
+        package=cpp_pkg_name,
         executable='swerve_drive',
         output='screen',
         parameters=[{'use_sim_time': True}] # Ép Sim Time về True tại đây
