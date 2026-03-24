@@ -14,8 +14,8 @@ public:
     SwerveController() : Node("swerve_controller"), x_(0.0), y_(0.0), theta_(0.0), current_vx_(0.0), current_vy_(0.0), current_omega_(0.0)
     {
         // --- THÔNG SỐ ROBOT ---
-        L_ = 1.8;   // Chiều dài cơ sở
-        W_ = 0.425; // Chiều rộng cơ sở
+        L_ = 1.476;   
+        W_ = 0.510;
         wheel_radius_ = 0.125;
 
         wheel_positions_ = {

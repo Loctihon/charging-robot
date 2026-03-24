@@ -17,6 +17,12 @@ find_package(nav_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(nav2_msgs REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(OpenCV REQUIRED)
+
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -38,9 +44,24 @@ ament_target_dependencies(donghocnghich rclcpp std_msgs geometry_msgs sensor_msg
 add_executable(swerve_drive src/swerve_drive.cpp)
 ament_target_dependencies(swerve_drive rclcpp geometry_msgs std_msgs nav_msgs tf2 tf2_ros)
 
+#Node tính pnp
+add_executable(solvepnp src/solvepnp.cpp)
+ament_target_dependencies(solvepnp rclcpp sensor_msgs geometry_msgs cv_bridge OpenCV tf2 tf2_geometry_msgs)
+
+# Depth Heatmap Node
+add_executable(depth_heatmap src/depth_heatmap.cpp)
+ament_target_dependencies(depth_heatmap rclcpp sensor_msgs cv_bridge OpenCV)
+
+# Auto Docking Node
+add_executable(god_view_2 src/god_view_2.cpp)
+ament_target_dependencies(god_view_2 rclcpp rclcpp_action geometry_msgs nav2_msgs tf2 tf2_ros tf2_geometry_msgs)
+
 install(TARGETS
   donghocnghich
   swerve_drive
+  solvepnp
+  depth_heatmap
+  god_view_2
   DESTINATION lib/${PROJECT_NAME}
 )
 ament_package()

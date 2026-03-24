@@ -12,6 +12,11 @@ from launch.actions import AppendEnvironmentVariable
 def generate_launch_description():
     pkg_name = 'thanxe_new_description'
     cpp_pkg_name = "my_ur_control_cpp"
+    nav2_pkg_name = 'nav2_bringup'
+
+    map_file_path = os.path.join(get_package_share_directory(pkg_name), 'maps', 'my_vinfast_map.yaml')
+    nav2_params_path = os.path.join(get_package_share_directory(pkg_name), 'config', 'nav2_params.yaml')
+
 
     # Đường dẫn đến file Xacro gốc
     xacro_path = os.path.join(get_package_share_directory(pkg_name), 'urdf', 'complete_visual.xacro')
@@ -50,6 +55,16 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')]),
         launch_arguments={'world': world_file_path, 'use_sim_time': 'true'}.items() # Ép Gazebo load file world của bạn
+    )
+    nav2_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory(nav2_pkg_name), 'launch', 'bringup_launch.py'
+        )]),
+        launch_arguments={
+            'use_sim_time': 'True',
+            'map': map_file_path,
+            'params_file': nav2_params_path
+        }.items()
     )
 
     # 6. Spawn Controllers
@@ -118,7 +133,15 @@ def generate_launch_description():
         name='GAZEBO_MODEL_PATH',
         value=external_models_path
     )
-    
+    rviz_config_file = os.path.join(get_package_share_directory(pkg_name), 'config', 'SLAM.rviz')
+    rviz = Node(
+        package='rviz2',
+        executable='rviz2',
+        arguments=['-d', rviz_config_file],
+        output='screen',
+        parameters=[{'use_sim_time': True}]
+    )
+
     node_swerve_drive = Node(
         package=cpp_pkg_name,
         executable='swerve_drive',
@@ -127,18 +150,19 @@ def generate_launch_description():
     )
 
     node_depth_heatmap = Node(
-        package=pkg_name,
+        package=cpp_pkg_name,
         executable='depth_heatmap',
         output='screen',
         parameters=[{'use_sim_time': True}]
     )
 
-    node_sovlepnp = Node(
-        package=pkg_name,
-        executable='sovlepnp',
+    node_solvepnp = Node(
+        package=cpp_pkg_name,
+        executable='solvepnp',
         output='screen',
         parameters=[{'use_sim_time': True}]
     )
+    
     node_spawn_station = Node(
         package='gazebo_ros',
         executable='spawn_entity.py',
@@ -189,6 +213,7 @@ def generate_launch_description():
 
 
     return LaunchDescription([
+        # nav2_launch,
         set_gazebo_model_path,
         gazebo,
         node_robot_state_publisher,
@@ -199,7 +224,8 @@ def generate_launch_description():
         node_spawn_station2,
         node_spawn_station3,
         node_swerve_drive,
+        rviz,
         node_depth_heatmap,
-        node_sovlepnp
-
+        node_solvepnp,  
+        
     ])

@@ -28,6 +28,7 @@ setup(
             # 'donghocnghich = my_ur_control.only_arm_commander:main',
             'donghocnghich = my_ur_control.donghocnghich:main',
             'donghocthuan = my_ur_control.DH_Thuan:main',
+            'donghocchuan = my_ur_control.arm_commander:main',
 
         ],
     },

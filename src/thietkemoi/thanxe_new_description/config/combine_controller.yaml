@@ -145,5 +145,5 @@ forward_position_controller:
       - ur10_shoulder_pan_joint
       - ur10_shoulder_lift_joint
       - ur10_elbow_joint
-      - ur10_wrist_1_join
+      - ur10_wrist_1_joint
 
