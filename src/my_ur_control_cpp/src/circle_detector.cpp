@@ -497,10 +497,10 @@ private:
         char buf[80];
         std::snprintf(buf, sizeof(buf),
                       "(%.2f,%.2f,%.2f)m d=%.2f", smoothX_, smoothY_, smoothZ_, depthVal);
-        cv::putText(debugImg, buf,
-                    cv::Point(cx_px + 10, cy_px - 10),
-                    cv::FONT_HERSHEY_SIMPLEX, 0.55,
-                    cv::Scalar(0, 255, 255), 2);
+        // cv::putText(debugImg, buf,
+        //             cv::Point(cx_px + 10, cy_px - 10),
+        //             cv::FONT_HERSHEY_SIMPLEX, 0.55,
+        //             cv::Scalar(0, 255, 255), 2);
 
         // ── Detect & draw pin-hole keypoints ──
         std::vector<cv::Point2f> holes = detectPinHoles(rgbBgr, contour);

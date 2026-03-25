@@ -125,7 +125,7 @@ def generate_launch_description():
     )
     home_dir = os.environ['HOME']
     
-    external_models_path = os.path.join(home_dir, 'charging-robot', 'src', 'models')
+    external_models_path = os.path.join(home_dir, 'new_design_ws', 'src', 'models')
     
     station_sdf_path = os.path.join(external_models_path, 'tram_sac_VF', 'model.sdf')
 
