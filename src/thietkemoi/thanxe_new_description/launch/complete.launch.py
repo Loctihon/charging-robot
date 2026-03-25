@@ -125,7 +125,7 @@ def generate_launch_description():
     )
     home_dir = os.environ['HOME']
     
-    external_models_path = os.path.join(home_dir, 'new_design_ws', 'src', 'models')
+    external_models_path = os.path.join(home_dir, 'charging-robot', 'src', 'models')
     
     station_sdf_path = os.path.join(external_models_path, 'tram_sac_VF', 'model.sdf')
 
@@ -159,6 +159,13 @@ def generate_launch_description():
     node_solvepnp = Node(
         package=cpp_pkg_name,
         executable='solvepnp',
+        output='screen',
+        parameters=[{'use_sim_time': True}]
+    )
+
+    node_circle_detector = Node(
+        package=cpp_pkg_name,
+        executable='circle_detector',
         output='screen',
         parameters=[{'use_sim_time': True}]
     )
@@ -226,6 +233,6 @@ def generate_launch_description():
         node_swerve_drive,
         rviz,
         node_depth_heatmap,
-        node_solvepnp,  
-        
+        node_solvepnp,
+        node_circle_detector,
     ])

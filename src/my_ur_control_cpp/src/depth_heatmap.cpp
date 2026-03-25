@@ -43,10 +43,8 @@ private:
         normalized.convertTo(gray, CV_8UC1, 255.0);
 
         // Lật màu: gần = đỏ, xa = xanh (255 - gray)
-        cv::Mat gray_flipped = 255 - gray;
-        
         cv::Mat heatmap;
-        cv::applyColorMap(gray_flipped, heatmap, cv::COLORMAP_JET);
+        cv::applyColorMap(gray, heatmap, cv::COLORMAP_JET);
 
         // Set các điểm ảnh không hợp lệ (depth <= 0) thành màu đen
         heatmap.setTo(cv::Scalar(0, 0, 0), depth <= 0);
