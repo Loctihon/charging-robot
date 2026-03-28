@@ -22,6 +22,7 @@ find_package(nav2_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(message_filters REQUIRED)
+find_package(ccs2_socket_detector REQUIRED)
 
 
 
@@ -57,9 +58,13 @@ ament_target_dependencies(depth_heatmap rclcpp sensor_msgs cv_bridge OpenCV)
 add_executable(god_view_2 src/god_view_2.cpp)
 ament_target_dependencies(god_view_2 rclcpp rclcpp_action geometry_msgs nav2_msgs tf2 tf2_ros tf2_geometry_msgs)
 
-# Circle Detector Node
-add_executable(circle_detector src/circle_detector.cpp)
-ament_target_dependencies(circle_detector rclcpp sensor_msgs geometry_msgs std_msgs cv_bridge OpenCV message_filters)
+# CCS2 Socket Detector Node
+add_executable(ccs2_detector_node src/ccs2_detector_node.cpp)
+target_include_directories(ccs2_detector_node PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+ament_target_dependencies(ccs2_detector_node
+  rclcpp sensor_msgs std_msgs cv_bridge OpenCV message_filters ccs2_socket_detector)
 
 install(TARGETS
   donghocnghich
@@ -67,7 +72,7 @@ install(TARGETS
   solvepnp
   depth_heatmap
   god_view_2
-  circle_detector
+  ccs2_detector_node
   DESTINATION lib/${PROJECT_NAME}
 )
 ament_package()

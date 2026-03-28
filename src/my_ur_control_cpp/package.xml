@@ -23,6 +23,8 @@
   <depend>nav2_msgs</depend>
   <depend>cv_bridge</depend>
   <depend>OpenCV</depend>
+  <depend>message_filters</depend>
+  <depend>ccs2_socket_detector</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

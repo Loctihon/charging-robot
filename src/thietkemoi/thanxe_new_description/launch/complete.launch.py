@@ -125,7 +125,7 @@ def generate_launch_description():
     )
     home_dir = os.environ['HOME']
     
-    external_models_path = os.path.join(home_dir, 'new_design_ws', 'src', 'models')
+    external_models_path = os.path.join(home_dir, 'charging-robot', 'src', 'models')
     
     station_sdf_path = os.path.join(external_models_path, 'tram_sac_VF', 'model.sdf')
 
@@ -220,7 +220,6 @@ def generate_launch_description():
 
 
     return LaunchDescription([
-        # nav2_launch,
         set_gazebo_model_path,
         gazebo,
         node_robot_state_publisher,
