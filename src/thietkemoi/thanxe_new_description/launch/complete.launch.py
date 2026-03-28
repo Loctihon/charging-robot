@@ -163,9 +163,9 @@ def generate_launch_description():
         parameters=[{'use_sim_time': True}]
     )
 
-    node_circle_detector = Node(
+    node_ccs2_detector = Node(
         package=cpp_pkg_name,
-        executable='circle_detector',
+        executable='ccs2_detector_node',
         output='screen',
         parameters=[{'use_sim_time': True}]
     )
@@ -233,5 +233,5 @@ def generate_launch_description():
         rviz,
         node_depth_heatmap,
         node_solvepnp,
-        node_circle_detector,
+        node_ccs2_detector,
     ])

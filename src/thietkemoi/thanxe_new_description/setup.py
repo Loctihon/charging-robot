@@ -30,8 +30,6 @@ setup(
         'swerve_drive = thanxe_new_description.swerve_controller:main',
         'auto_mobile = thanxe_new_description.auto_mobile_PID:main',
         'test_AQ = thanxe_new_description.test_AQ:main',
-        'depth_heatmap = thanxe_new_description.depth_heatmap:main',
-        'sovlepnp = thanxe_new_description.sovlepnp:main',
         ],
     },
 )
