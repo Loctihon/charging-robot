@@ -2,6 +2,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
+#include <std_msgs/msg/header.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
@@ -36,14 +37,17 @@ private:
   cv::Mat buildBinaryMaskGamma(const cv::Mat & preprocessed);
 
   // ── Pipeline — MODE B: HSV color filter (Gazebo / sim) ───────────────────
-  // Input is BGR (already converted from rgb8 correctly).
-  // Returns binary mask isolating the gold/yellow socket region.
   cv::Mat buildBinaryMaskHSV(const cv::Mat & bgr);
 
   // ── Shared steps ──────────────────────────────────────────────────────────
-  cv::Mat applyMorphCleanup(const cv::Mat & raw_mask);
+  // scale_hint: 1.0 = close range, <1.0 = far (shrinks SE sizes)
+  cv::Mat applyMorphCleanup(const cv::Mat & raw_mask, double scale_hint = 1.0);
+  cv::Mat extractSocketShape(
+    const cv::Mat & binary_mask,
+    const cv::Mat & binarized_median);
   bool    extractSocket(
-    const cv::Mat & mask,
+    const cv::Mat & binary_mask,
+    const cv::Mat & socket_shape,
     const cv::Mat & depth32f,
     ccs2_socket_detector::msg::SocketDetection & out,
     cv::RotatedRect & rotated_rect,
@@ -55,10 +59,18 @@ private:
     const cv::RotatedRect & rot,
     ccs2_socket_detector::msg::SocketDetection & out);
 
+  // ── Adaptive helpers ──────────────────────────────────────────────────────
+  // Returns a scale factor in [min_scale, 1.0] based on last known depth.
+  // ref_depth is the close-range reference (full-size SE distance).
+  double depthScale() const;
+  // Round to nearest odd integer >= 3
+  static int toOdd(int v) { return std::max(3, v % 2 == 0 ? v + 1 : v); }
+
   // ── Debug ─────────────────────────────────────────────────────────────────
   void publishDebug(
     const cv::Mat & bgr,
     const cv::Mat & mask,
+    const cv::Mat & socket_shape,
     const ccs2_socket_detector::msg::SocketDetection & det,
     const cv::Rect & bbox,
     const std_msgs::msg::Header & header);
@@ -73,12 +85,7 @@ private:
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr mask_pub_;
 
   // ── Parameters ────────────────────────────────────────────────────────────
-  // true  → HSV color filter  (Gazebo / simulation)
-  // false → gamma pipeline    (real ZED 2i hardware)
   bool use_color_filter_;
-
-  // Input encoding from camera driver ("rgb8" or "bgr8")
-  // Node always works internally in BGR — conversion is automatic.
   std::string image_encoding_;
 
   // --- Gamma pipeline params (MODE A) ---
@@ -86,9 +93,12 @@ private:
   int    median_ksize_;
   int    morph_radius_;
 
+  // --- CLAHE pre-enhancement (MODE A, helps at distance) ---
+  bool   use_clahe_;
+  double clahe_clip_;
+  int    clahe_grid_;
+
   // --- HSV color filter params (MODE B) ---
-  // Gold/yellow socket in Gazebo: H≈20-35, S≈100-255, V≈100-255
-  // All tunable at runtime via ROS params.
   int hsv_h_low_;   int hsv_h_high_;
   int hsv_s_low_;   int hsv_s_high_;
   int hsv_v_low_;   int hsv_v_high_;
@@ -98,6 +108,24 @@ private:
   double socket_w_mm_;
   double min_area_;
   int    sync_queue_;
+
+  // --- Distance-adaptive tuning ---
+  // Morphological SE and filter sizes scale down as the socket moves farther.
+  // ref_depth_m: the distance at which full-size parameters apply (close range).
+  // min_scale:   floor on the scale factor (prevents SEs collapsing to 0).
+  bool   adaptive_morph_;
+  double ref_depth_m_;
+  double min_scale_;
+
+  // --- Aspect-ratio filter ---
+  // CCS2 socket H≈135mm, W≈90mm → bbox height/width ≈ 1.5.
+  // Set generous bounds to tolerate tilt and perspective.
+  bool   use_aspect_filter_;
+  double aspect_ratio_min_;   // bbox.height / bbox.width lower bound
+  double aspect_ratio_max_;   // bbox.height / bbox.width upper bound
+
+  // ── State ─────────────────────────────────────────────────────────────────
+  float last_depth_;   // running estimate from previous frames (metres)
 };
 
 }  // namespace ccs2_socket_detector
