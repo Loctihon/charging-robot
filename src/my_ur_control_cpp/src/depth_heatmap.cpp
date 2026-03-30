@@ -2,6 +2,7 @@
 #include <sensor_msgs/msg/image.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
+#include <limits>
 
 class DepthHeatmap : public rclcpp::Node {
 public:
@@ -26,8 +27,11 @@ private:
 
         // Thay thế NaN và Inf bằng 0.0
         cv::patchNaNs(depth, 0.0);
-        
-        // Tạo mask cho các giá trị > 0
+        cv::Mat inf_mask;
+        cv::compare(depth, std::numeric_limits<float>::infinity(), inf_mask, cv::CMP_EQ);
+        depth.setTo(0.0f, inf_mask);
+
+        // Tạo mask cho các giá trị > 0 và hữu hạn
         cv::Mat valid_mask = depth > 0;
         
         double d_min, d_max;
@@ -43,10 +47,8 @@ private:
         normalized.convertTo(gray, CV_8UC1, 255.0);
 
         // Lật màu: gần = đỏ, xa = xanh (255 - gray)
-        cv::Mat gray_flipped = 255 - gray;
-        
         cv::Mat heatmap;
-        cv::applyColorMap(gray_flipped, heatmap, cv::COLORMAP_JET);
+        cv::applyColorMap(gray, heatmap, cv::COLORMAP_JET);
 
         // Set các điểm ảnh không hợp lệ (depth <= 0) thành màu đen
         heatmap.setTo(cv::Scalar(0, 0, 0), depth <= 0);
