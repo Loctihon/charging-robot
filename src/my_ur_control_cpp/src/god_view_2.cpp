@@ -34,9 +34,9 @@ public:
         tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
         tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
-        stations_["1"] = {{7.5, 0.0, 0.0}, {8.5, -0.3, 1.57}};  
-        stations_["2"] = {{7.5, 4.0, 0.0}, {8.5, 3.7, 1.57}};  
-        stations_["3"] = {{0.0, 7.5, 1.57}, {0.3, 8.5, 3.14}}; 
+        stations_["1"] = {{7.5, 0.0, 0.0}, {8.5, -0.4, 1.57}};  
+        stations_["2"] = {{7.5, 4.0, 0.0}, {8.5, 3.6, 1.57}};  
+        stations_["3"] = {{0.0, 7.5, 1.57}, {0.4, 8.5, 3.14}}; 
 
         timer_ = create_wall_timer(std::chrono::milliseconds(100), std::bind(&AutoDockingNode::control_loop, this));
         

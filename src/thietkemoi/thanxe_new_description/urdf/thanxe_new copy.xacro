@@ -1,0 +1,256 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:include filename="$(find thanxe_new_description)/urdf/materials.xacro" />
+
+<xacro:include filename="$(find thanxe_new_description)/urdf/thanxe_new.gazebo" />
+<xacro:include filename="$(find thanxe_new_description)/urdf/inertial_macros.xacro" />
+<xacro:include filename="$(find thanxe_new_description)/urdf/ros2_control.xacro" />
+
+<link name="base_footprint">
+</link>
+
+<joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+</joint>
+
+<link name="base_link">
+  <xacro:inertial_box mass = "150" x="1.800" y="0.85" z="1.0">
+    <origin xyz="0 0 0.35" rpy="0 0 0"/>
+  </xacro:inertial_box>
+  <visual>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="white"/>
+  </visual>
+  <collision>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="Revolute1_1"> 
+  <xacro:inertial_box mass="3.0" x="0.135" y="0.135" z="0.31">
+    <origin xyz="0 0 -0.17" rpy="0 0 0"/>
+  </xacro:inertial_box>
+
+  <visual>
+    <origin xyz="-0.738 -0.255 -0.355" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Revolute1_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="gold"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.738 -0.255 -0.355" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Revolute1_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="Revolute2_1">
+  <xacro:inertial_box mass="3.0" x="0.135" y="0.135" z="0.31">
+    <origin xyz="0 0 -0.17" rpy="0 0 0"/>
+  </xacro:inertial_box>
+
+  <visual>
+    <origin xyz="-0.738 0.255 -0.355" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Revolute2_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="gold"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.738 0.255 -0.355" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Revolute2_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="Revolute3_1">
+  <xacro:inertial_box mass="3.0" x="0.135" y="0.135" z="0.31">
+    <origin xyz="0 0 -0.17" rpy="0 0 0"/>
+  </xacro:inertial_box>
+
+  <visual>
+    <origin xyz="0.738 -0.255 -0.355" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Revolute3_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="gold"/>
+  </visual>
+  <collision>
+    <origin xyz="0.738 -0.255 -0.355" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Revolute3_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="Revolute4_1">
+  <xacro:inertial_box mass="3.0" x="0.135" y="0.135" z="0.31">
+    <origin xyz="0 0 -0.17" rpy="0 0 0"/>
+  </xacro:inertial_box>
+
+  <visual>
+    <origin xyz="0.738 0.255 -0.355" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Revolute4_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="gold"/>
+  </visual>
+  <collision>
+    <origin xyz="0.738 0.255 -0.355" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Revolute4_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+<link name="Wheel1_1">
+  <xacro:inertial_cylinder mass="15.0" length="0.05" radius="0.125" >
+    <origin xyz="0 0 0" rpy="1.57 0 0"/>
+  </xacro:inertial_cylinder>
+  <visual>
+    <origin xyz="-0.738 -0.255 -0.125" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Wheel1_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="black"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.738 -0.255 -0.125" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Wheel1_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+<link name="Wheel2_1">
+  <xacro:inertial_cylinder mass="15.0" length="0.05" radius="0.125" >
+    <origin xyz="0 0 0" rpy="1.57 0 0"/>
+  </xacro:inertial_cylinder>
+  <visual>
+    <origin xyz="-0.738 0.255 -0.125" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Wheel2_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="black"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.738 0.255 -0.125" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Wheel2_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+<link name="Wheel3_1">
+  <xacro:inertial_cylinder mass="15.0" length="0.05" radius="0.125" >
+    <origin xyz="0 0 0" rpy="1.57 0 0"/>
+  </xacro:inertial_cylinder>
+  <visual>
+    <origin xyz="0.738 -0.255 -0.125" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Wheel3_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="black"/>
+  </visual>
+  <collision>
+    <origin xyz="0.738 -0.255 -0.125" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Wheel3_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="Wheel4_1">
+  <xacro:inertial_cylinder mass="15.0" length="0.05" radius="0.125" >
+    <origin xyz="0 0 0" rpy="1.57 0 0"/>
+  </xacro:inertial_cylinder>
+
+  <visual>
+    <origin xyz="0.738 0.255 -0.125" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Wheel4_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="black"/>
+  </visual>
+  <collision>
+    <origin xyz="0.738 0.255 -0.125" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find thanxe_new_description)/meshes/Wheel4_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<joint name="Revolute1_to_base_link" type="continuous">
+  <origin xyz="0.738 0.255 0.355" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="Revolute1_1"/>
+  <axis xyz="0.0 -0.0 1.0"/>
+  <limit effort="10000" velocity="30.0"/>
+</joint>
+
+<joint name="Revolute2_to_base_link" type="continuous">
+  <origin xyz="0.738 -0.255 0.355" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="Revolute2_1"/>
+  <axis xyz="0.0 -0.0 1.0"/>
+  <limit effort="10000" velocity="30.0"/>
+</joint>
+
+<joint name="Revolute3_to_base_link" type="continuous">
+  <origin xyz="-0.738 0.255 0.355" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="Revolute3_1"/>
+  <axis xyz="0.0 -0.0 1.0"/>
+  <limit effort="10000" velocity="30.0"/>
+</joint>
+
+<joint name="Revolute4_to_base_link" type="continuous">
+  <origin xyz="-0.738 -0.255 0.355" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="Revolute4_1"/>
+  <axis xyz="0.0 -0.0 1.0"/>
+  <limit effort="10000" velocity="30.0"/>
+</joint>
+
+<joint name="Wheel1_to_Revolute1" type="continuous">
+  <origin xyz="0.0 0.0 -0.23" rpy="0 0 0"/>
+  <parent link="Revolute1_1"/>
+  <child link="Wheel1_1"/>
+  <axis xyz="0.0 1.0 0.0"/>
+  <limit effort="10000" velocity="30.0"/>
+</joint>
+
+<joint name="Wheel2_to_Revolute2" type="continuous">
+  <origin xyz="0.0 0.0 -0.23" rpy="0 0 0"/>
+  <parent link="Revolute2_1"/>
+  <child link="Wheel2_1"/>
+  <axis xyz="0.0 1.0 0.0"/>
+  <limit effort="10000" velocity="30.0"/>
+</joint>
+
+<joint name="Wheel3_to_Revolute3" type="continuous">
+  <origin xyz="0.0 0.0 -0.23" rpy="0 0 0"/>
+  <parent link="Revolute3_1"/>
+  <child link="Wheel3_1"/>
+  <axis xyz="0.0 1.0 0.0"/>
+  <limit effort="10000" velocity="30.0"/>
+</joint>
+
+<joint name="Wheel4_to_Revolute4" type="continuous">
+  <origin xyz="0.0 0.0 -0.23" rpy="0 0 0"/>
+  <parent link="Revolute4_1"/>
+  <child link="Wheel4_1"/>
+  <axis xyz="0.0 1.0 0.0"/>
+  <limit effort="10000" velocity="30.0"/>
+</joint>
+
+</robot>

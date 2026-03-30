@@ -42,7 +42,7 @@ target_link_libraries(donghocnghich Eigen3::Eigen)
 ament_target_dependencies(donghocnghich rclcpp std_msgs geometry_msgs sensor_msgs trajectory_msgs)
 # Node swerve drive
 add_executable(swerve_drive src/swerve_drive.cpp)
-ament_target_dependencies(swerve_drive rclcpp geometry_msgs std_msgs nav_msgs tf2 tf2_ros)
+ament_target_dependencies(swerve_drive rclcpp geometry_msgs std_msgs nav_msgs tf2 tf2_ros sensor_msgs)
 
 #Node tính pnp
 add_executable(solvepnp src/solvepnp.cpp)

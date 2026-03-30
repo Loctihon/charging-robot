@@ -18,11 +18,12 @@ public:
         W_ = 0.510;
         wheel_radius_ = 0.125;
 
+        // [FL, FR, RL, RR]
         wheel_positions_ = {
-            { L_ / 2.0,  W_ / 2.0}, // trước trái
-            { L_ / 2.0, -W_ / 2.0}, // trước phải
-            {-L_ / 2.0,  W_ / 2.0}, // sau trái
-            {-L_ / 2.0, -W_ / 2.0}  // sau phải
+            { L_ / 2.0,  W_ / 2.0}, 
+            { L_ / 2.0, -W_ / 2.0}, 
+            {-L_ / 2.0,  W_ / 2.0}, 
+            {-L_ / 2.0, -W_ / 2.0}  
         };
 
         last_time_ = this->now();
@@ -32,7 +33,7 @@ public:
         tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
         sub_cmd_ = this->create_subscription<geometry_msgs::msg::Twist>(
-            "/cmd_vel", 10, std::bind(&SwerveController::listener_callback, this, std::placeholders::_1));
+            "/cmd_vel_nav", 10, std::bind(&SwerveController::listener_callback, this, std::placeholders::_1));
             
         pub_steering_ = this->create_publisher<std_msgs::msg::Float64MultiArray>("/steering_controller/commands", 10);
         pub_drive_ = this->create_publisher<std_msgs::msg::Float64MultiArray>("/drive_controller/commands", 10);
@@ -42,7 +43,7 @@ public:
             std::chrono::milliseconds(50), 
             std::bind(&SwerveController::update_odometry, this));
 
-        RCLCPP_INFO(this->get_logger(), "Swerve Controller C++ đã khởi động! (Bán kính: %.3fm)", wheel_radius_);
+        RCLCPP_INFO(this->get_logger(), "Swerve Open-Loop Controller (Bản Gốc Ổn Định) đã khởi động!");
     }
 
 private:
@@ -68,26 +69,43 @@ private:
         std_msgs::msg::Float64MultiArray msg_steer;
         std_msgs::msg::Float64MultiArray msg_drive;
 
-        for (const auto& pos : wheel_positions_) {
-            double wx = pos.first;
-            double wy = pos.second;
+        std::vector<double> speeds(4);
+        std::vector<double> angles(4);
+        double max_speed = 0.0;
 
-            double wheel_vx = current_vx_ - current_omega_ * wy;
-            double wheel_vy = current_vy_ + current_omega_ * wx;
+        for (int i = 0; i < 4; i++) {
+            double x_pos = wheel_positions_[i].first;
+            double y_pos = wheel_positions_[i].second;
+
+            // Động học ngược chuẩn ROS 2
+            double wheel_vx = current_vx_ - current_omega_ * y_pos;
+            double wheel_vy = current_vy_ + current_omega_ * x_pos;
 
             double target_linear_speed = std::hypot(wheel_vx, wheel_vy);
             double target_angle = std::atan2(wheel_vy, wheel_vx);
 
-            // Tối ưu đảo chiều bánh xe
-            if (std::abs(target_angle) > M_PI / 2.0) {
-                target_angle = (target_angle > 0) ? (target_angle - M_PI) : (target_angle + M_PI);
-                target_linear_speed = -target_linear_speed;
-            }
-
             double target_angular_speed = target_linear_speed / wheel_radius_;
 
-            msg_steer.data.push_back(target_angle);
-            msg_drive.data.push_back(target_angular_speed);
+            speeds[i] = target_angular_speed;
+            angles[i] = target_angle;
+
+            if (std::abs(target_angular_speed) > max_speed) {
+                max_speed = std::abs(target_angular_speed);
+            }
+        }
+
+        // Tối ưu NORMALIZE (Giúp xe không lạng đuôi khi chạy nhanh)
+        double max_allowed = 10.0;
+        if (max_speed > max_allowed) {
+            double scale = max_allowed / max_speed;
+            for (auto &s : speeds) {
+                s *= scale;
+            }
+        }
+
+        for (int i = 0; i < 4; i++) {
+            msg_steer.data.push_back(angles[i]);
+            msg_drive.data.push_back(speeds[i]);
         }
 
         pub_steering_->publish(msg_steer);
@@ -100,7 +118,7 @@ private:
         double dt = (current_time - last_time_).seconds();
         last_time_ = current_time;
 
-        // Dead Reckoning
+        // Dead Reckoning (Odom ảo nhưng siêu mượt cho giả lập)
         double delta_x = (current_vx_ * std::cos(theta_) - current_vy_ * std::sin(theta_)) * dt;
         double delta_y = (current_vx_ * std::sin(theta_) + current_vy_ * std::cos(theta_)) * dt;
         double delta_th = current_omega_ * dt;
@@ -125,6 +143,10 @@ private:
         odom.pose.pose.orientation.y = q.y();
         odom.pose.pose.orientation.z = q.z();
         odom.pose.pose.orientation.w = q.w();
+
+        odom.twist.twist.linear.x = current_vx_;
+        odom.twist.twist.linear.y = current_vy_;
+        odom.twist.twist.angular.z = current_omega_;
 
         odom_pub_->publish(odom);
 

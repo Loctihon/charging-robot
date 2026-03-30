@@ -146,7 +146,9 @@ def generate_launch_description():
         package=cpp_pkg_name,
         executable='swerve_drive',
         output='screen',
-        parameters=[{'use_sim_time': True}] # Ép Sim Time về True tại đây
+        parameters=[{'use_sim_time': True}, {'publish_odom': False}],
+        remappings=[('/cmd_vel', '/cmd_vel_nav')] 
+        # Ép Sim Time về True tại đây
     )
 
     node_depth_heatmap = Node(
@@ -225,7 +227,6 @@ def generate_launch_description():
         node_spawn_station3,
         node_swerve_drive,
         rviz,
-        node_depth_heatmap,
-        node_solvepnp,  
-        
+        # node_depth_heatmap,
+        # node_solvepnp,  
     ])
