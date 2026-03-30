@@ -83,6 +83,7 @@ private:
   rclcpp::Publisher<ccs2_socket_detector::msg::SocketDetection>::SharedPtr det_pub_;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr debug_pub_;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr mask_pub_;
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr raw_mask_pub_;  // raw binary before morph fill
 
   // ── Parameters ────────────────────────────────────────────────────────────
   bool use_color_filter_;

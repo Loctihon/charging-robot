@@ -1,237 +1,151 @@
+
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <geometry_msgs/msg/vector3.hpp>
+#include <geometry_msgs/msg/point_stamped.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
-#include <tf2/LinearMath/Quaternion.h>
-#include <tf2/LinearMath/Matrix3x3.h>
 #include <vector>
-#include <numeric>
 
-class PnPNode : public rclcpp::Node {
+class CircleDetectorNode : public rclcpp::Node
+{
 public:
-    PnPNode() : Node("pnp_node") {
-        // Subscribers & Publishers
-        sub_ = create_subscription<sensor_msgs::msg::Image>(
-            "/base_camera/base_camera_sensor/image_raw", 10,
-            std::bind(&PnPNode::image_callback, this, std::placeholders::_1));
+  CircleDetectorNode() : Node("circle_detector_node")
+  {
+    // --- tuneable params ---
+    this->declare_parameter("min_area",         0.0);   // px^2  (filter single-pixel noise)
+    this->declare_parameter("max_area",      5000.0);   // px^2  (generous upper bound)
+    this->declare_parameter("min_circularity", 0.55);   // 0~1
+    // RETR mode: 0=EXTERNAL, 1=LIST, 2=CCOMP, 3=TREE
+    this->declare_parameter("retr_mode",          0);   // EXTERNAL is fine on isolated holes image
 
-        pose_pub_ = create_publisher<geometry_msgs::msg::PoseStamped>("/object_pose", 10);
-        image_pub_ = create_publisher<sensor_msgs::msg::Image>("/pnp_debug/image", 10);
-        mask_pub_ = create_publisher<sensor_msgs::msg::Image>("/pnp_debug/mask", 10);
-        tvec_pub_ = create_publisher<geometry_msgs::msg::Vector3>("/pnp/tvec", 10);
-        rvec_pub_ = create_publisher<geometry_msgs::msg::Vector3>("/pnp/rvec", 10);
-        
-        // Camera Params (1280x720, HFOV 60)
-        double fx = 1280.0 / (2.0 * tan((60.0 * M_PI / 180.0) / 2.0));
-        K_ = (cv::Mat_<double>(3, 3) << fx, 0, 640.0, 0, fx, 360.0, 0, 0, 1);
-        dist_ = cv::Mat::zeros(4, 1, CV_64F);
+    // Subscribe to raw_mask: binary BEFORE morph cleanup fills the dark holes
+    image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
+      "/ccs2_detector_node/raw_mask", 10,
+      std::bind(&CircleDetectorNode::imageCb, this, std::placeholders::_1));
 
-        // Object points (90mm x 117.5mm)
-        float hw = 0.045f, hh = 0.05875f;
-        obj_pts_ = {
-            cv::Point3f(-hw, hh, 0),  // TL
-            cv::Point3f(hw, hh, 0),   // TR
-            cv::Point3f(hw, -hh, 0),  // BR
-            cv::Point3f(-hw, -hh, 0)  // BL
-        };
+    debug_image_pub_ = this->create_publisher<sensor_msgs::msg::Image>(
+      "/circle_detector/debug_image", 10);
 
-        kernel_open_ = cv::Mat::ones(3, 3, CV_8U);
-        kernel_close_ = cv::Mat::ones(7, 7, CV_8U);
+    center_pub_ = this->create_publisher<geometry_msgs::msg::PointStamped>(
+      "/circle_detector/circle_center", 10);
 
-        timer_ = create_wall_timer(std::chrono::milliseconds(33), std::bind(&PnPNode::process, this));
-        RCLCPP_INFO(this->get_logger(), "PnP C++ Node started.");
-    }
+    RCLCPP_INFO(this->get_logger(), "CircleDetectorNode started (hole-aware contour mode).");
+  }
 
 private:
-    std::vector<cv::Point2f> order_points(const cv::Point2f pts[4]) {
-        std::vector<cv::Point2f> rect(4);
-        std::vector<float> sums(4), diffs(4);
-        for(int i = 0; i < 4; ++i) {
-            sums[i] = pts[i].x + pts[i].y;
-            diffs[i] = pts[i].y - pts[i].x;
-        }
-        rect[0] = pts[std::distance(sums.begin(), std::min_element(sums.begin(), sums.end()))];   // TL
-        rect[2] = pts[std::distance(sums.begin(), std::max_element(sums.begin(), sums.end()))];   // BR
-        rect[1] = pts[std::distance(diffs.begin(), std::min_element(diffs.begin(), diffs.end()))]; // TR
-        rect[3] = pts[std::distance(diffs.begin(), std::max_element(diffs.begin(), diffs.end()))]; // BL
-        return rect;
+  void imageCb(const sensor_msgs::msg::Image::SharedPtr msg)
+  {
+    cv_bridge::CvImagePtr cv_ptr;
+    try {
+      cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8);
+    } catch (const cv_bridge::Exception & e) {
+      RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
+      return;
     }
 
-    void image_callback(const sensor_msgs::msg::Image::SharedPtr msg) {
-        try {
-            latest_frame_ = cv_bridge::toCvCopy(msg, "bgr8")->image;
-        } catch (cv_bridge::Exception& e) {
-            RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
+    double min_area  = this->get_parameter("min_area").as_double();
+    double max_area  = this->get_parameter("max_area").as_double();
+    double min_circ  = this->get_parameter("min_circularity").as_double();
+    int    retr_mode = this->get_parameter("retr_mode").as_int();
+
+    cv::Mat gray = cv_ptr->image.clone();
+
+    // Clean binary: socket=255, holes=0, background=0
+    cv::Mat binary;
+    cv::threshold(gray, binary, 127, 255, cv::THRESH_BINARY);
+
+    // Invert: socket=0 (invisible), holes=255, background=255
+    // Background blob area >> max_area → filtered out automatically.
+    // Socket body is 0 → not detected by findContours.
+    // Dark holes inside socket → white blobs → detected as circles.
+    cv::Mat inverted;
+    cv::bitwise_not(binary, inverted);
+
+    // Use RETR_LIST to get all contours without hierarchy overhead.
+    // Background blob has enormous area and is removed by max_area filter.
+    (void)retr_mode;  // kept as parameter for future use
+    std::vector<std::vector<cv::Point>> contours;
+    cv::findContours(inverted, contours, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
+
+    RCLCPP_INFO(this->get_logger(), "Raw contours found: %zu", contours.size());
+
+    // Debug image (BGR từ ảnh gốc)
+    cv::Mat debug_img;
+    cv::cvtColor(cv_ptr->image, debug_img, cv::COLOR_GRAY2BGR);
+
+    int circle_count = 0;
+
+    for (size_t i = 0; i < contours.size(); ++i) {
+      double area = cv::contourArea(contours[i]);
+      if (area < min_area || area > max_area) {
+        // Background blob has huge area — only log small rejections to avoid spam
+        if (area <= max_area * 2.0) {
+          RCLCPP_INFO(this->get_logger(),
+            "Contour %zu rejected: area=%.1f (range [%.1f, %.1f])", i, area, min_area, max_area);
         }
+        continue;
+      }
+
+      double perimeter = cv::arcLength(contours[i], true);
+      if (perimeter < 1e-5) continue;
+
+      // Circularity = 4π·Area / P²
+      double circularity = 4.0 * CV_PI * area / (perimeter * perimeter);
+      if (circularity < min_circ) {
+        RCLCPP_INFO(this->get_logger(),
+          "Contour %zu rejected: circularity=%.2f < %.2f (area=%.1f)", i, circularity, min_circ, area);
+        continue;
+      }
+
+      // Tâm qua image moments
+      cv::Moments m = cv::moments(contours[i]);
+      if (std::abs(m.m00) < 1e-5) continue;
+      int cx = static_cast<int>(m.m10 / m.m00);
+      int cy = static_cast<int>(m.m01 / m.m00);
+      int radius = static_cast<int>(std::sqrt(area / CV_PI));
+
+      // Vẽ debug
+      cv::circle(debug_img, cv::Point(cx, cy), radius, cv::Scalar(0, 255, 0), 1);
+      cv::circle(debug_img, cv::Point(cx, cy), 3,      cv::Scalar(0, 0, 255), -1);
+      std::string label = "(" + std::to_string(cx) + "," + std::to_string(cy) + ")";
+      cv::putText(debug_img, label, cv::Point(cx + 5, cy - 5),
+                  cv::FONT_HERSHEY_SIMPLEX, 0.35, cv::Scalar(0, 255, 255), 1);
+
+      RCLCPP_INFO(this->get_logger(),
+        "Circle[%d]: center=(%d,%d) r=%d area=%.1f circ=%.2f",
+        circle_count, cx, cy, radius, area, circularity);
+
+      // Publish tâm
+      geometry_msgs::msg::PointStamped pt;
+      pt.header = msg->header;
+      pt.point.x = static_cast<double>(cx);
+      pt.point.y = static_cast<double>(cy);
+      pt.point.z = static_cast<double>(radius);
+      center_pub_->publish(pt);
+
+      circle_count++;
     }
 
-    void process() {
-        if (latest_frame_.empty()) return;
-        cv::Mat frame = latest_frame_.clone();
-        cv::Mat hsv, mask;
-        cv::cvtColor(frame, hsv, cv::COLOR_BGR2HSV);
-        cv::inRange(hsv, cv::Scalar(10, 50, 30), cv::Scalar(40, 255, 200), mask);
+    cv::putText(debug_img,
+      "Circles: " + std::to_string(circle_count),
+      cv::Point(5, 15), cv::FONT_HERSHEY_SIMPLEX, 0.5,
+      cv::Scalar(255, 200, 0), 1);
 
-        // Morphology để khử nhiễu (Giống Python)
-        cv::morphologyEx(mask, mask, cv::MORPH_OPEN, kernel_open_, cv::Point(-1,-1), 1);
-        cv::morphologyEx(mask, mask, cv::MORPH_CLOSE, kernel_close_, cv::Point(-1,-1), 2);
+    // RCLCPP_INFO(this->get_logger(), "Total circles: %d", circle_count);
 
-        std::vector<std::vector<cv::Point>> contours;
-        cv::findContours(mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    auto debug_msg = cv_bridge::CvImage(msg->header, "bgr8", debug_img).toImageMsg();
+    debug_image_pub_->publish(*debug_msg);
+  }
 
-        bool detected = false;
-
-        if (!contours.empty()) {
-            auto biggest = *std::max_element(contours.begin(), contours.end(), 
-                [](const std::vector<cv::Point>& a, const std::vector<cv::Point>& b) {
-                    return cv::contourArea(a) < cv::contourArea(b);
-                });
-
-            if (cv::contourArea(biggest) > 500) {
-                cv::RotatedRect rect = cv::minAreaRect(biggest);
-                cv::Point2f pts[4]; rect.points(pts);
-                std::vector<cv::Point2f> img_pts = order_points(pts);
-
-                // Vẽ viền chữ nhật màu vàng
-                std::vector<cv::Point> int_img_pts(4);
-                for(int i=0; i<4; i++) int_img_pts[i] = img_pts[i];
-                cv::polylines(frame, int_img_pts, true, cv::Scalar(0, 255, 255), 2);
-
-                cv::Mat rvec, tvec;
-                bool success = false;
-                
-                if (has_prev_extrinsic_) {
-                    rvec = prev_rvec_.clone();
-                    tvec = prev_tvec_.clone();
-                    success = cv::solvePnP(obj_pts_, img_pts, K_, dist_, rvec, tvec, true, cv::SOLVEPNP_ITERATIVE);
-                } else {
-                    success = cv::solvePnP(obj_pts_, img_pts, K_, dist_, rvec, tvec, false, cv::SOLVEPNP_IPPE_SQUARE);
-                }
-
-                if (success) {
-                    // Check Reprojection Error
-                    std::vector<cv::Point2f> reproj_pts;
-                    cv::projectPoints(obj_pts_, rvec, tvec, K_, dist_, reproj_pts);
-                    double err = 0;
-                    for (size_t i = 0; i < img_pts.size(); ++i) {
-                        err += cv::norm(reproj_pts[i] - img_pts[i]);
-                    }
-                    err /= img_pts.size();
-
-                    if (err <= 10.0) {
-                        prev_rvec_ = rvec.clone();
-                        prev_tvec_ = tvec.clone();
-                        has_prev_extrinsic_ = true;
-
-                        // Chuyển rvec sang Quaternion để SLERP
-                        cv::Mat R;
-                        cv::Rodrigues(rvec, R);
-                        tf2::Matrix3x3 tf2_R(R.at<double>(0,0), R.at<double>(0,1), R.at<double>(0,2),
-                                             R.at<double>(1,0), R.at<double>(1,1), R.at<double>(1,2),
-                                             R.at<double>(2,0), R.at<double>(2,1), R.at<double>(2,2));
-                        tf2::Quaternion rot_cur;
-                        tf2_R.getRotation(rot_cur);
-
-                        // Reset smooth nếu nhảy xa
-                        bool big_jump = false;
-                        if (has_smooth_) {
-                            double jump = cv::norm(tvec - tvec_smooth_);
-                            if (jump > max_jump_) big_jump = true;
-                        }
-
-                        if (!has_smooth_ || big_jump) {
-                            rot_smooth_ = rot_cur;
-                            tvec_smooth_ = tvec.clone();
-                            has_smooth_ = true;
-                        } else {
-                            // SLERP cho Rotation và LERP cho Translation
-                            rot_smooth_ = rot_smooth_.slerp(rot_cur, 1.0 - alpha_);
-                            tvec_smooth_ = alpha_ * tvec_smooth_ + (1.0 - alpha_) * tvec;
-                        }
-
-                        publish_data(frame, rot_smooth_, tvec_smooth_);
-                        detected = true;
-                    }
-                }
-            }
-        }
-
-        if (!detected) {
-            has_prev_extrinsic_ = false;
-            cv::putText(frame, "NO DETECTION", cv::Point(10, 30), 
-                        cv::FONT_HERSHEY_SIMPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
-        }
-
-        image_pub_->publish(*cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", frame).toImageMsg());
-        mask_pub_->publish(*cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", mask).toImageMsg());
-    }
-
-    void publish_data(cv::Mat& frame, tf2::Quaternion q, cv::Mat tvec) {
-        geometry_msgs::msg::PoseStamped msg;
-        msg.header.stamp = this->now();
-        msg.header.frame_id = "camera";
-        msg.pose.position.x = tvec.at<double>(0);
-        msg.pose.position.y = tvec.at<double>(1);
-        msg.pose.position.z = tvec.at<double>(2);
-        msg.pose.orientation.x = q.x();
-        msg.pose.orientation.y = q.y();
-        msg.pose.orientation.z = q.z();
-        msg.pose.orientation.w = q.w();
-        pose_pub_->publish(msg);
-
-        tf2::Matrix3x3 R_smooth(q);
-        cv::Mat R_mat = (cv::Mat_<double>(3,3) << R_smooth[0][0], R_smooth[0][1], R_smooth[0][2],
-                                                  R_smooth[1][0], R_smooth[1][1], R_smooth[1][2],
-                                                  R_smooth[2][0], R_smooth[2][1], R_smooth[2][2]);
-        cv::Mat rvec_s;
-        cv::Rodrigues(R_mat, rvec_s);
-
-        geometry_msgs::msg::Vector3 t_msg, r_msg;
-        t_msg.x = tvec.at<double>(0); t_msg.y = tvec.at<double>(1); t_msg.z = tvec.at<double>(2);
-        r_msg.x = rvec_s.at<double>(0); r_msg.y = rvec_s.at<double>(1); r_msg.z = rvec_s.at<double>(2);
-        tvec_pub_->publish(t_msg);
-        rvec_pub_->publish(r_msg);
-
-        std::vector<cv::Point3f> axis = {
-            {0,0,0}, {0.05,0,0}, {0,0.05,0}, {0,0,0.05}
-        };
-        std::vector<cv::Point2f> imgpts;
-        cv::projectPoints(axis, rvec_s, tvec, K_, dist_, imgpts);
-        cv::line(frame, imgpts[0], imgpts[1], cv::Scalar(0,0,255), 3); // X đỏ
-        cv::line(frame, imgpts[0], imgpts[2], cv::Scalar(0,255,0), 3); // Y xanh lá
-        cv::line(frame, imgpts[0], imgpts[3], cv::Scalar(255,0,0), 3); // Z xanh dương
-
-        // Ghi Text
-        char text[100];
-        sprintf(text, "x=%.3f y=%.3f z=%.3f", t_msg.x, t_msg.y, t_msg.z);
-        cv::putText(frame, text, cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 0.7, cv::Scalar(0, 255, 0), 2);
-    }
-
-    rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_;
-    rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub_;
-    rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr image_pub_, mask_pub_;
-    rclcpp::Publisher<geometry_msgs::msg::Vector3>::SharedPtr tvec_pub_, rvec_pub_;
-    rclcpp::TimerBase::SharedPtr timer_;
-    
-    cv::Mat latest_frame_, K_, dist_, kernel_open_, kernel_close_;
-    std::vector<cv::Point3f> obj_pts_;
-
-    bool has_prev_extrinsic_ = false;
-    cv::Mat prev_rvec_, prev_tvec_;
-    
-    bool has_smooth_ = false;
-    tf2::Quaternion rot_smooth_;
-    cv::Mat tvec_smooth_;
-    double alpha_ = 0.3;
-    double max_jump_ = 0.15;
+  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr image_sub_;
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr     debug_image_pub_;
+  rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr center_pub_;
 };
 
-int main(int argc, char ** argv) {
-    rclcpp::init(argc, argv);
-    auto node = std::make_shared<PnPNode>();
-    rclcpp::spin(node);
-    rclcpp::shutdown();
-    return 0;
-}
+int main(int argc, char ** argv)
+{
+  rclcpp::init(argc, argv);
+  rclcpp::spin(std::make_shared<CircleDetectorNode>());
+  rclcpp::shutdown();
+  return 0;
+}   

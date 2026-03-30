@@ -111,10 +111,11 @@ Ccs2DetectorNode::Ccs2DetectorNode(const rclcpp::NodeOptions & options)
   sync_->registerCallback(&Ccs2DetectorNode::syncCallback, this);
 
   // Publishers
-  det_pub_   = this->create_publisher<ccs2_socket_detector::msg::SocketDetection>(
+  det_pub_      = this->create_publisher<ccs2_socket_detector::msg::SocketDetection>(
     "~/socket_detection", 10);
-  debug_pub_ = this->create_publisher<sensor_msgs::msg::Image>("~/debug_image", 10);
-  mask_pub_  = this->create_publisher<sensor_msgs::msg::Image>("~/mask_image",  10);
+  debug_pub_    = this->create_publisher<sensor_msgs::msg::Image>("~/debug_image", 10);
+  mask_pub_     = this->create_publisher<sensor_msgs::msg::Image>("~/mask_image",  10);
+  raw_mask_pub_ = this->create_publisher<sensor_msgs::msg::Image>("~/raw_mask",    10);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -188,6 +189,14 @@ void Ccs2DetectorNode::syncCallback(
     cv::Mat pre = preprocessRGB(bgr);
     raw_mask         = buildBinaryMaskGamma(pre);
     binarized_median = raw_mask.clone();
+  }
+
+  // ── Publish raw binary mask for circle detection (before morph fills holes) ─
+  if (raw_mask_pub_->get_subscription_count() > 0) {
+    cv::Mat raw_bgr;
+    cv::cvtColor(binarized_median, raw_bgr, cv::COLOR_GRAY2BGR);
+    raw_mask_pub_->publish(
+      *cv_bridge::CvImage(rgb_msg->header, "bgr8", raw_bgr).toImageMsg());
   }
 
   // ── Morphological cleanup — pass scale so SEs shrink when far ─────────────
@@ -620,17 +629,10 @@ void Ccs2DetectorNode::publishDebug(
   const cv::Rect & bbox,
   const std_msgs::msg::Header & header)
 {
-  if (mask_pub_->get_subscription_count() > 0) {
-    cv::Mat mc, sc;
-    cv::cvtColor(mask, mc, cv::COLOR_GRAY2BGR);
-    if (!socket_shape.empty()) {
-      cv::cvtColor(socket_shape, sc, cv::COLOR_GRAY2BGR);
-      cv::Mat combined;
-      cv::hconcat(mc, sc, combined);
-      mask_pub_->publish(*cv_bridge::CvImage(header, "bgr8", combined).toImageMsg());
-    } else {
-      mask_pub_->publish(*cv_bridge::CvImage(header, "bgr8", mc).toImageMsg());
-    }
+  if (!socket_shape.empty()) {
+    cv::Mat sc;
+    cv::cvtColor(socket_shape, sc, cv::COLOR_GRAY2BGR);
+    mask_pub_->publish(*cv_bridge::CvImage(header, "bgr8", sc).toImageMsg());
   }
 
   if (debug_pub_->get_subscription_count() > 0) {
