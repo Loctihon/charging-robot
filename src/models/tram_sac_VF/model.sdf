@@ -30,7 +30,7 @@
         <material>
           <script>
             <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Gold</name>
+            <name>Gazebo/Black</name>
           </script>
         </material>
       </visual>
@@ -67,7 +67,7 @@
         </material>
       </visual>
 
-      <visual name="visual_aruco">
+      <!-- <visual name="visual_aruco">
         <pose>0 -0.005 0.87 -1.57 0 0</pose> 
         <geometry>
           <box>
@@ -81,7 +81,7 @@
             <name>ArucoMarker0</name>
           </script>
         </material>
-      </visual>
+      </visual> -->
       <collision name="collision_tru">
         <pose>0 0.1 0.45 0 0 0</pose> 
         <geometry>

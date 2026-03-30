@@ -62,7 +62,7 @@
     <xacro:add_camera 
         name="base_camera" 
         parent="base_link" 
-        xyz="0.88 0 0.85" 
+        xyz="0.88 0 0.80" 
         rpy="0 0.15 0"
         distance_min="0.01"
         distance_max="40" />

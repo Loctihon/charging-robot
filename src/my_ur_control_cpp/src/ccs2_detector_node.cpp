@@ -16,28 +16,28 @@ Ccs2DetectorNode::Ccs2DetectorNode(const rclcpp::NodeOptions & options)
   last_depth_(0.0f)
 {
   // Mode switch: true = HSV color filter (Gazebo), false = gamma (real hw)
-  this->declare_parameter("use_color_filter", true);
+  this->declare_parameter("use_color_filter", false);
   this->declare_parameter("image_encoding",   std::string("rgb8"));
 
   // --- Gamma pipeline (MODE A: real hardware) ---
   this->declare_parameter("gamma",        0.001);
   this->declare_parameter("median_ksize", 9);
-  this->declare_parameter("morph_radius", 18);
+  this->declare_parameter("morph_radius", 12);
 
   // --- CLAHE pre-enhancement ---
   // Applying CLAHE before gamma lifts local contrast in dark regions,
   // which is the main reason detection degrades at distance.
-  this->declare_parameter("use_clahe",   true);
+  this->declare_parameter("use_clahe",  false);
   this->declare_parameter("clahe_clip",  2.0);
   this->declare_parameter("clahe_grid",  8);
 
   // --- HSV filter (MODE B: Gazebo/sim) ---
   this->declare_parameter("hsv_h_low",  8);
   this->declare_parameter("hsv_h_high", 29);
-  this->declare_parameter("hsv_s_low",  223);
+  this->declare_parameter("hsv_s_low",  150);
   this->declare_parameter("hsv_s_high", 255);
-  this->declare_parameter("hsv_v_low",  21);
-  this->declare_parameter("hsv_v_high", 64);
+  this->declare_parameter("hsv_v_low",  15);
+  this->declare_parameter("hsv_v_high", 80);
 
   // --- Shared ---
   this->declare_parameter("socket_h_mm", 135.0);
@@ -293,7 +293,7 @@ cv::Mat Ccs2DetectorNode::buildBinaryMaskGamma(const cv::Mat & preprocessed)
 {
   cv::Mat binary;
   cv::threshold(preprocessed, binary, 0, 255,
-    cv::THRESH_BINARY | cv::THRESH_OTSU);
+    cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
   return binary;
 }
 
