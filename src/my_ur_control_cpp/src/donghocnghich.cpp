@@ -224,28 +224,56 @@ private:
         return best_sol;
     }
 
+    // Set to true for XYZ-only mode (fixed orientation below)
+    // Set to false for full XYZ + RPY mode
+    static constexpr bool XYZ_ONLY = true;
+
+    // Fixed end-effector orientation used in XYZ-only mode
+    static constexpr double FIXED_ROLL  = M_PI;
+    static constexpr double FIXED_PITCH = 0.0;
+    static constexpr double FIXED_YAW   = (M_PI * 3) / 2;
+
     void terminal_input_loop() {
         while (rclcpp::ok()) {
             cout << "\n==================================================\n";
             cout << "Nhập tọa độ mục tiêu (cách nhau bởi dấu cách)\n";
-            cout << "Định dạng: X Y Z Roll Pitch Yaw (Góc nhập bằng Độ)\n";
-            cout << "Ví dụ: 0.5 0.2 0.3 180 0 90\n";
+            if (XYZ_ONLY) {
+                cout << "Chế độ: XYZ (hướng cố định)\n";
+                cout << "Định dạng: X Y Z\n";
+                cout << "Ví dụ: 0.5 0.2 0.3\n";
+            } else {
+                cout << "Chế độ: XYZ + RPY\n";
+                cout << "Định dạng: X Y Z Roll Pitch Yaw (Góc nhập bằng Độ)\n";
+                cout << "Ví dụ: 0.5 0.2 0.3 180 0 270\n";
+            }
             cout << "Mời nhập: ";
-            
+
             string input_line;
             getline(cin, input_line);
             if(input_line.empty()) continue;
 
             stringstream ss(input_line);
-            double x, y, z, r_deg, p_deg, yaw_deg;
-            if (!(ss >> x >> y >> z >> r_deg >> p_deg >> yaw_deg)) {
-                cout << "Vui lòng nhập đúng 6 số\n";
-                continue;
-            }
+            double x, y, z;
+            double r, p, yaw;
 
-            double r = r_deg * M_PI / 180.0;
-            double p = p_deg * M_PI / 180.0;
-            double yaw = yaw_deg * M_PI / 180.0;
+            if (XYZ_ONLY) {
+                if (!(ss >> x >> y >> z)) {
+                    cout << "Vui lòng nhập đúng 3 số\n";
+                    continue;
+                }
+                r   = FIXED_ROLL;
+                p   = FIXED_PITCH;
+                yaw = FIXED_YAW;
+            } else {
+                double r_deg, p_deg, yaw_deg;
+                if (!(ss >> x >> y >> z >> r_deg >> p_deg >> yaw_deg)) {
+                    cout << "Vui lòng nhập đúng 6 số\n";
+                    continue;
+                }
+                r   = r_deg   * M_PI / 180.0;
+                p   = p_deg   * M_PI / 180.0;
+                yaw = yaw_deg * M_PI / 180.0;
+            }
 
             cout << "\nĐang giải IK cho tọa độ: X=" << x << ", Y=" << y << ", Z=" << z << "...\n";
             

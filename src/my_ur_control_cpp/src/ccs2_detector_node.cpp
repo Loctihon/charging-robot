@@ -19,7 +19,7 @@ Ccs2DetectorNode::Ccs2DetectorNode(const rclcpp::NodeOptions & options)
   this->declare_parameter("use_color_filter", false);
   this->declare_parameter("image_encoding",   std::string("rgb8"));
 
-  // --- Gamma pipeline (MODE A: real hardware) ---
+  // --- Gamma pipeline  ---
   this->declare_parameter("gamma",        0.001);
   this->declare_parameter("median_ksize", 9);
   this->declare_parameter("morph_radius", 12);
@@ -424,10 +424,7 @@ bool Ccs2DetectorNode::extractSocket(
   std::vector<std::vector<cv::Point>> contours;
   cv::findContours(binary_mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
-  if (contours.empty()) {
-    RCLCPP_DEBUG(this->get_logger(), "No contours.");
-    return false;
-  }
+
 
   // Adaptive minimum area: scales as square of depth ratio because pixel count
   // per unit area shrinks quadratically with distance.

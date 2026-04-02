@@ -26,6 +26,14 @@ amcl:
 
     transform_tolerance: 1.0
 
+    # Auto initial pose — no manual "2D Pose Estimate" needed
+    set_initial_pose: true
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0
+
 
 # ==========================================================
 # CONTROLLER

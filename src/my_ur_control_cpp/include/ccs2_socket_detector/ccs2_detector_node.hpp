@@ -41,7 +41,7 @@ private:
 
   // ── Shared steps ──────────────────────────────────────────────────────────
   // scale_hint: 1.0 = close range, <1.0 = far (shrinks SE sizes)
-  cv::Mat applyMorphCleanup(const cv::Mat & raw_mask, double scale_hint = 1.0);
+  cv::Mat applyMorphCleanup(const cv::Mat & r_mask, double scale_hint = 1.0);
   cv::Mat extractSocketShape(
     const cv::Mat & binary_mask,
     const cv::Mat & binarized_median);

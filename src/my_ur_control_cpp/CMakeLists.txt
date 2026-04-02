@@ -66,6 +66,11 @@ target_include_directories(ccs2_detector_node PRIVATE
 ament_target_dependencies(ccs2_detector_node
   rclcpp sensor_msgs std_msgs cv_bridge OpenCV message_filters ccs2_socket_detector)
 
+# Plugin Node
+add_executable(plugin src/plugin.cpp)
+target_link_libraries(plugin Eigen3::Eigen)
+ament_target_dependencies(plugin rclcpp geometry_msgs trajectory_msgs)
+
 install(TARGETS
   donghocnghich
   swerve_drive
@@ -73,6 +78,7 @@ install(TARGETS
   depth_heatmap
   god_view_2
   ccs2_detector_node
+  plugin
   DESTINATION lib/${PROJECT_NAME}
 )
 ament_package()
