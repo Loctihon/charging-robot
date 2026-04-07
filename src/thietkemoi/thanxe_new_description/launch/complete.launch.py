@@ -146,7 +146,7 @@ def generate_launch_description():
         package=cpp_pkg_name,
         executable='swerve_drive',
         output='screen',
-        parameters=[{'use_sim_time': True}, {'publish_odom': False}],
+        parameters=[{'use_sim_time': True}],
         remappings=[('/cmd_vel', '/cmd_vel_nav')] 
         # Ép Sim Time về True tại đây
     )
