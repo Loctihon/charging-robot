@@ -32,8 +32,7 @@ class AutoDockingNode(Node):
         # 1. Approach: Lùi ra xa TRÊN 1.5 MÉT để Nav2 không đụng vùng xanh Inflation
         # 2. Dock: Lái xe bằng tay vô đậu thật đẹp -> gõ tf2_echo map base_footprint -> Điền số vô đây!
         self.stations = {
-            # Đã lùi approach ra X=7.5 để cực kỳ an toàn cho Nav2
-            '1': {'approach': (7.5, 0.0, 0.0), 'dock': (8.5, 0.0, 1.57)},
+            '1': {'approach': (8.5, 0.0, 0.0), 'dock': (8.5, 0.0, 0.0)},
             '2': {'approach': (7.5, 4.0, 0.0), 'dock': (8.5, 4.0, 1.57)},
             '3': {'approach': (0.0, 7.5, 1.57), 'dock': (0.0, 8.5, 3.14)}
         }

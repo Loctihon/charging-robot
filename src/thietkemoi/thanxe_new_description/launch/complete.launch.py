@@ -1,7 +1,7 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, RegisterEventHandler
+from launch.actions import IncludeLaunchDescription, RegisterEventHandler, TimerAction, ExecuteProcess
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
@@ -170,9 +170,9 @@ def generate_launch_description():
         executable='spawn_entity.py',
         arguments=[
             '-entity', 'tram_sac_VF1',
-            '-file', station_sdf_path, # Dùng đường dẫn tuyệt đối vừa tạo
-            '-x', '10.5',   # Tọa độ X
-            '-y', '0.0',   # Tọa độ Y
+            '-file', station_sdf_path, 
+            '-x', '10.5',   
+            '-y', '0.2',  
             '-z', '0.0',
             '-Y', '-1.57'   # Quay ngược lại nhìn robot
         ],
@@ -214,10 +214,38 @@ def generate_launch_description():
     
 
 
+    # Publish /initialpose once after 3 s so AMCL has time to start.
+    # Edit x, y, yaw to match your robot's real starting position on the map.
+    initial_pose_x   = '0.0'
+    initial_pose_y   = '0.0'
+    initial_pose_yaw = '0.0'   # radians
+
+    publish_initial_pose = TimerAction(
+        period=3.0,
+        actions=[ExecuteProcess(
+            cmd=[
+                'ros2', 'topic', 'pub', '--once', '/initialpose',
+                'geometry_msgs/msg/PoseWithCovarianceStamped',
+                (
+                    '{'
+                    '"header": {"frame_id": "map"}, '
+                    '"pose": {"pose": {'
+                    f'"position": {{"x": {initial_pose_x}, "y": {initial_pose_y}, "z": 0.0}}, '
+                    f'"orientation": {{"x": 0.0, "y": 0.0, "z": {float(initial_pose_yaw):.4f}, "w": 1.0}}'
+                    '}}, '
+                    '"covariance": [0.25,0,0,0,0,0, 0,0.25,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0.07]'
+                    '}'
+                )
+            ],
+            output='screen'
+        )]
+    )
+
     return LaunchDescription([
         # nav2_launch,
         set_gazebo_model_path,
         gazebo,
+        publish_initial_pose,
         node_robot_state_publisher,
         node_spawn_entity,
         load_joint_state_broadcaster,
