@@ -1,0 +1,200 @@
+<?xml version="1.0" ?>
+<sdf version='1.7'>
+  <world name='default'>
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+    
+    <gravity>0 0 -9.8</gravity>
+    <physics type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>1</shadows>
+    </scene>
+
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>0 -25 20 0 0.5 1.57</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+
+    <model name='custom_asphalt_plane'>
+      <static>true</static>
+      <pose>0 0 -0.05 0 0 0</pose>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry><plane><normal>0 0 1</normal><size>50 50</size></plane></geometry>
+          <surface><friction><ode><mu>100</mu><mu2>50</mu2></ode></friction></surface>
+        </collision>
+        <visual name='visual'>
+          <cast_shadows>false</cast_shadows>
+          <geometry><plane><normal>0 0 1</normal><size>50 50</size></plane></geometry>
+          <material>
+            <script>
+              <uri>model://asphalt_plane/materials/scripts</uri>
+              <uri>model://asphalt_plane/materials/textures</uri>
+              <name>vrc/asphalt</name>
+            </script>
+            <ambient>0.2 0.2 0.2 1</ambient>
+            <diffuse>0.2 0.2 0.2 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <include><name>slot_a1</name><uri>model://parking_slot</uri><pose>-10 8 0 0 0 1.57</pose></include>
+    <include><name>car_a1</name><uri>model://electric_car</uri><pose>-10 8 1.0 0 0 1.57</pose></include>
+
+    <include><name>slot_a2</name><uri>model://parking_slot</uri><pose>-5 8 0 0 0 1.57</pose></include>
+    <include><name>car_a2</name><uri>model://electric_car</uri><pose>-5 8 1.0 0 0 1.57</pose></include>
+
+    <include><name>slot_a3</name><uri>model://parking_slot</uri><pose>0 8 0 0 0 1.57</pose></include>
+    <include><name>car_a3</name><uri>model://electric_car</uri><pose>0 6.5 1.0 0 0 1.2</pose></include>
+
+    <include><name>slot_a4</name><uri>model://parking_slot</uri><pose>5 8 0 0 0 1.57</pose></include>
+    <include><name>car_a4</name><uri>model://electric_car</uri><pose>5 8 1.0 0 0 1.57</pose></include>
+
+    <include><name>slot_a5</name><uri>model://parking_slot</uri><pose>10 8 0 0 0 1.57</pose></include>
+    <include><name>car_a5</name><uri>model://electric_car</uri><pose>10 8 1.0 0 0 1.57</pose></include>
+
+    <include><name>slot_b1</name><uri>model://parking_slot</uri><pose>-10 -8 0 0 0 -1.57</pose></include>
+    <include><name>car_b1</name><uri>model://electric_car</uri><pose>-10 -8 1.0 0 0 -1.57</pose></include>
+
+    <include><name>slot_b2</name><uri>model://parking_slot</uri><pose>-5 -8 0 0 0 -1.57</pose></include>
+    <include><name>car_b2</name><uri>model://electric_car</uri><pose>-5 -7.0 1.0 0 0 -1.57</pose></include>
+
+    <include><name>slot_b3</name><uri>model://parking_slot</uri><pose>0 -8 0 0 0 -1.57</pose></include>
+    <include><name>car_b3</name><uri>model://electric_car</uri><pose>0 -8 1.0 0 0 -1.57</pose></include>
+
+    <include><name>slot_b4</name><uri>model://parking_slot</uri><pose>5 -8 0 0 0 -1.57</pose></include>
+    <include><name>car_b4</name><uri>model://electric_car</uri><pose>5 -8 1.0 0 0 -1.57</pose></include>
+
+    <include><name>slot_b5</name><uri>model://parking_slot</uri><pose>10 -8 0 0 0 -1.57</pose></include>
+    <include><name>car_b5</name><uri>model://electric_car</uri><pose>10 -8 1.0 0 0 -1.57</pose></include>
+
+    <model name='concrete_pillars'>
+      <static>true</static>
+      <link name='pillar_a1'><pose>-7.5 8 1.5 0 0 0</pose>
+        <collision name='c'><geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry></collision>
+        <visual name='v'><geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script></material></visual>
+      </link>
+      <link name='pillar_a2'><pose>-2.5 8 1.5 0 0 0</pose>
+        <collision name='c'><geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry></collision>
+        <visual name='v'><geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script></material></visual>
+      </link>
+      <link name='pillar_a3'><pose>7.5 8 1.5 0 0 0</pose>
+        <collision name='c'><geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry></collision>
+        <visual name='v'><geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script></material></visual>
+      </link>
+      <link name='pillar_b1'><pose>-7.5 -8 1.5 0 0 0</pose>
+        <collision name='c'><geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry></collision>
+        <visual name='v'><geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script></material></visual>
+      </link>
+      <link name='pillar_b2'><pose>2.5 -8 1.5 0 0 0</pose>
+        <collision name='c'><geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry></collision>
+        <visual name='v'><geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script></material></visual>
+      </link>
+      <link name='pillar_b3'><pose>7.5 -8 1.5 0 0 0</pose>
+        <collision name='c'><geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry></collision>
+        <visual name='v'><geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry><material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script></material></visual>
+      </link>
+    </model>
+
+    <include><name>tree_t1</name><uri>model://pine_tree</uri><pose>-15 15 0 0 0 0</pose></include>
+    <include><name>tree_t2</name><uri>model://pine_tree</uri><pose>-5 15 0 0 0 0</pose></include>
+    <include><name>tree_t3</name><uri>model://pine_tree</uri><pose>5 15 0 0 0 0</pose></include>
+    <include><name>tree_t4</name><uri>model://pine_tree</uri><pose>15 15 0 0 0 0</pose></include>
+    <include><name>tree_b1</name><uri>model://pine_tree</uri><pose>-15 -15 0 0 0 0</pose></include>
+    <include><name>tree_b2</name><uri>model://pine_tree</uri><pose>-5 -15 0 0 0 0</pose></include>
+    <include><name>tree_b3</name><uri>model://pine_tree</uri><pose>5 -15 0 0 0 0</pose></include>
+    <include><name>tree_b4</name><uri>model://pine_tree</uri><pose>15 -15 0 0 0 0</pose></include>
+    <include><name>tree_l1</name><uri>model://pine_tree</uri><pose>-15 5 0 0 0 0</pose></include>
+    <include><name>tree_l2</name><uri>model://pine_tree</uri><pose>-15 -5 0 0 0 0</pose></include>
+    <include><name>tree_r1</name><uri>model://pine_tree</uri><pose>15 5 0 0 0 0</pose></include>
+    <include><name>tree_r2</name><uri>model://pine_tree</uri><pose>15 -5 0 0 0 0</pose></include>\
+
+    <model name='parking_gate'>
+      <static>true</static>
+      
+      <link name='gate_pillar_left'>
+        <pose>-20 4 1.5 0 0 0</pose>
+        <collision name='c'><geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry></collision>
+        <visual name='v'>
+          <geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Bricks</name></script></material>
+        </visual>
+      </link>
+      
+      <link name='gate_pillar_right'>
+        <pose>-20 -4 1.5 0 0 0</pose>
+        <collision name='c'><geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry></collision>
+        <visual name='v'>
+          <geometry><cylinder><radius>0.4</radius><length>3.0</length></cylinder></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Bricks</name></script></material>
+        </visual>
+      </link>
+      
+      <link name='speed_bump_entrance'>
+        <pose>-20 0 0.025 0 0 0</pose>
+        <collision name='c'><geometry><box><size>0.5 8 0.05</size></box></geometry></collision>
+        <visual name='v'>
+          <geometry><box><size>0.5 8 0.05</size></box></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Yellow</name></script></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='boundary_walls'>
+      <static>true</static>
+      <link name='wall_north'>
+        <pose>0 20 1.5 0 0 0</pose>
+        <collision name='c'><geometry><box><size>40 0.2 3</size></box></geometry></collision>
+        <visual name='v'>
+          <geometry><box><size>40 0.2 3</size></box></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Bricks</name></script></material>
+        </visual>
+      </link>
+      <link name='wall_south'>
+        <pose>0 -20 1.5 0 0 0</pose>
+        <collision name='c'><geometry><box><size>40 0.2 3</size></box></geometry></collision>
+        <visual name='v'>
+          <geometry><box><size>40 0.2 3</size></box></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Bricks</name></script></material>
+        </visual>
+      </link>
+      <link name='wall_west_upper'>
+        <pose>-20 12 1.5 0 0 1.57</pose>
+        <collision name='c'><geometry><box><size>16 0.2 3</size></box></geometry></collision>
+        <visual name='v'><geometry><box><size>16 0.2 3</size></box></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Bricks</name></script></material>
+        </visual>
+      </link>
+      <link name='wall_west_lower'>
+        <pose>-20 -12 1.5 0 0 1.57</pose>
+        <collision name='c'><geometry><box><size>16 0.2 3</size></box></geometry></collision>
+        <visual name='v'><geometry><box><size>16 0.2 3</size></box></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Bricks</name></script></material>
+        </visual>
+      </link>
+      <link name='wall_east'>
+        <pose>20 0 1.5 0 0 1.57</pose>
+        <collision name='c'><geometry><box><size>40 0.2 3</size></box></geometry></collision>
+        <visual name='v'>
+          <geometry><box><size>40 0.2 3</size></box></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Bricks</name></script></material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

@@ -339,31 +339,7 @@ NavfnPlanner::makePlan(
         " potential was found. This shouldn't happen.");
     }
   }
-  if (!plan.poses.empty()) {
-    // Lấy tọa độ X, Y của trạm sạc (Đích đến)
-    double gx = goal.position.x;
-    double gy = goal.position.y;
 
-    // Duyệt qua toàn bộ các điểm trên đường đi mà Dijkstra vừa vẽ ra
-    for (size_t i = 0; i < plan.poses.size(); ++i) {
-      double px = plan.poses[i].pose.position.x;
-      double py = plan.poses[i].pose.position.y;
-
-      // Tính góc hướng mặt về phía Đích (để camera luôn nhìn thấy trạm sạc)
-      double look_at_yaw = std::atan2(gy - py, gx - px);
-      double target_yaw = look_at_yaw;  //+ (M_PI / 2.0);
-
-      // Nếu là điểm cuối cùng (hoặc sát cuối), ta giữ nguyên góc của Goal cho chuẩn xác
-      if (i >= plan.poses.size() - 2) {
-        plan.poses[i].pose.orientation = goal.orientation;
-      } else {
-        // Cập nhật lại góc Yaw cho tất cả các điểm trên đường
-        plan.poses[i].pose.orientation = nav2_util::geometry_utils::orientationAroundZAxis(target_yaw);
-      }
-    }
-    RCLCPP_INFO(logger_, "Đã bẻ góc Yaw cho Swerve Drive trên %zu điểm Dijkstra!", plan.poses.size());
-  }
-  // =====================================================================
   return !plan.poses.empty();
 }
 

@@ -214,45 +214,45 @@ def generate_launch_description():
     
 
 
-    # Publish /initialpose once after 3 s so AMCL has time to start.
-    # Edit x, y, yaw to match your robot's real starting position on the map.
-    initial_pose_x   = '0.0'
-    initial_pose_y   = '0.0'
-    initial_pose_yaw = '0.0'   # radians
+    # # Publish /initialpose once after 3 s so AMCL has time to start.
+    # # Edit x, y, yaw to match your robot's real starting position on the map.
+    # initial_pose_x   = '0.0'
+    # initial_pose_y   = '0.0'
+    # initial_pose_yaw = '0.0'   # radians
 
-    publish_initial_pose = TimerAction(
-        period=3.0,
-        actions=[ExecuteProcess(
-            cmd=[
-                'ros2', 'topic', 'pub', '--once', '/initialpose',
-                'geometry_msgs/msg/PoseWithCovarianceStamped',
-                (
-                    '{'
-                    '"header": {"frame_id": "map"}, '
-                    '"pose": {"pose": {'
-                    f'"position": {{"x": {initial_pose_x}, "y": {initial_pose_y}, "z": 0.0}}, '
-                    f'"orientation": {{"x": 0.0, "y": 0.0, "z": {float(initial_pose_yaw):.4f}, "w": 1.0}}'
-                    '}}, '
-                    '"covariance": [0.25,0,0,0,0,0, 0,0.25,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0.07]'
-                    '}'
-                )
-            ],
-            output='screen'
-        )]
-    )
+    # publish_initial_pose = TimerAction(
+    #     period=3.0,
+    #     actions=[ExecuteProcess(
+    #         cmd=[
+    #             'ros2', 'topic', 'pub', '--once', '/initialpose',
+    #             'geometry_msgs/msg/PoseWithCovarianceStamped',
+    #             (
+    #                 '{'
+    #                 '"header": {"frame_id": "map"}, '
+    #                 '"pose": {"pose": {'
+    #                 f'"position": {{"x": {initial_pose_x}, "y": {initial_pose_y}, "z": 0.0}}, '
+    #                 f'"orientation": {{"x": 0.0, "y": 0.0, "z": {float(initial_pose_yaw):.4f}, "w": 1.0}}'
+    #                 '}}, '
+    #                 '"covariance": [0.25,0,0,0,0,0, 0,0.25,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0.07]'
+    #                 '}'
+    #             )
+    #         ],
+    #         output='screen'
+    #     )]
+    # )
 
     return LaunchDescription([
         # nav2_launch,
         set_gazebo_model_path,
         gazebo,
-        publish_initial_pose,
+        # publish_initial_pose,
         node_robot_state_publisher,
         node_spawn_entity,
         load_joint_state_broadcaster,
         load_base_controllers,
-        node_spawn_station,
-        node_spawn_station2,
-        node_spawn_station3,
+        # node_spawn_station,
+        # node_spawn_station2,
+        # node_spawn_station3,
         node_swerve_drive,
         rviz,
         # node_depth_heatmap,
