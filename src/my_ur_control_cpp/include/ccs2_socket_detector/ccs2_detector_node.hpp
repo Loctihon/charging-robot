@@ -1,5 +1,14 @@
 #pragma once
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Compile-time debug-pipeline switch.
+// Set to true to display a 3×3 dashboard via cv::imshow() every frame.
+// When false the node behaves exactly as before (zero overhead).
+// ─────────────────────────────────────────────────────────────────────────────
+constexpr bool SHOW_PIPELINE = true;
+
+#include <mutex>
+
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <std_msgs/msg/header.hpp>
@@ -14,6 +23,25 @@
 
 namespace ccs2_socket_detector
 {
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Intermediate images captured during the gamma pipeline.
+// Only populated when SHOW_PIPELINE == true.
+// ─────────────────────────────────────────────────────────────────────────────
+// 3×3 grid layout:
+//   Row 0: RGB | Gray | CLAHE
+//   Row 1: Gamma | Otsu Binary | Morph Cleanup
+//   Row 2: Socket Shape | Final Detection | Circle Detector
+struct PipelineImages
+{
+  cv::Mat gray;       // tile 1: BGR→Gray
+  cv::Mat clahe;      // tile 2: CLAHE (or gray if disabled)
+  cv::Mat gamma;      // tile 3: power-law transform
+  cv::Mat otsu;       // tile 4: Otsu binary mask
+  cv::Mat morph;      // tile 5: morphological cleanup
+  cv::Mat socket;     // tile 6: socket shape (bitwise AND + morph)
+  cv::Mat detection;  // tile 7: final BGR with bbox / centroid
+};
 
 class Ccs2DetectorNode : public rclcpp::Node
 {
@@ -33,7 +61,7 @@ private:
     const sensor_msgs::msg::Image::ConstSharedPtr & depth_msg);
 
   // ── Pipeline — MODE A: gamma (real hardware) ──────────────────────────────
-  cv::Mat preprocessRGB(const cv::Mat & bgr);
+  cv::Mat preprocessRGB(const cv::Mat & bgr, PipelineImages * pipe = nullptr);
   cv::Mat buildBinaryMaskGamma(const cv::Mat & preprocessed);
 
   // ── Pipeline — MODE B: HSV color filter (Gazebo / sim) ───────────────────
@@ -75,10 +103,23 @@ private:
     const cv::Rect & bbox,
     const std_msgs::msg::Header & header);
 
+  // ── Pipeline visualization helpers (only active when SHOW_PIPELINE==true) ──
+  // makeTile: resize + convert to BGR + draw title label on a 320×240 tile.
+  static cv::Mat makeTile(const std::string & title, const cv::Mat & img,
+                          cv::Size tile_size = cv::Size(320, 240));
+  // showPipeline: assemble 9 tiles into a 3×3 dashboard and call imshow.
+  // circle_img: latest frame from /circle_detector/debug_image (may be empty).
+  static void showPipeline(const cv::Mat & rgb_bgr,
+                           const PipelineImages & imgs,
+                           const cv::Mat & circle_img);
+
   // ── ROS interfaces ────────────────────────────────────────────────────────
   message_filters::Subscriber<sensor_msgs::msg::Image> rgb_sub_;
   message_filters::Subscriber<sensor_msgs::msg::Image> depth_sub_;
   std::shared_ptr<Synchronizer> sync_;
+
+  // Subscriber for circle-detector debug image (displayed as last dashboard tile)
+  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr circle_det_sub_;
 
   rclcpp::Publisher<ccs2_socket_detector::msg::SocketDetection>::SharedPtr det_pub_;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr debug_pub_;
@@ -126,7 +167,11 @@ private:
   double aspect_ratio_max_;   // bbox.height / bbox.width upper bound
 
   // ── State ─────────────────────────────────────────────────────────────────
-  float last_depth_;   // running estimate from previous frames (metres)
+  float last_depth_;          // running estimate from previous frames (metres)
+
+  // Latest image from /circle_detector/debug_image (protected by mutex).
+  mutable std::mutex circle_img_mutex_;
+  cv::Mat            last_circle_img_;  // empty until first message arrives
 };
 
 }  // namespace ccs2_socket_detector

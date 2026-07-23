@@ -7,6 +7,8 @@ from action_msgs.msg import GoalStatus
 import math
 import numpy as np
 import threading
+
+# Import thêm thư viện TF2 để đọc tọa độ thực từ Map
 from tf2_ros import Buffer, TransformListener
 
 def euler_from_quaternion(x, y, z, w):
@@ -28,16 +30,14 @@ class AutoDockingNode(Node):
         self.state = "IDLE"
         self.pid_step = 0
 
-        # --- LƯU Ý TỌA ĐỘ ---
-        # 1. Approach: Lùi ra xa TRÊN 1.5 MÉT để Nav2 không đụng vùng xanh Inflation
-        # 2. Dock: Lái xe bằng tay vô đậu thật đẹp -> gõ tf2_echo map base_footprint -> Điền số vô đây!
+        # Tọa độ: Nhớ dùng lệnh 'tf2_echo' để đo lại cho chuẩn xác nha Lộc
         self.stations = {
-            # Đã lùi approach ra X=7.5 để cực kỳ an toàn cho Nav2
-            '1': {'approach': (7.5, 0.0, 1.57), 'dock': (8.5, 0.0, 1.57)},
-            '2': {'approach': (7.5, 4.0, 1.57), 'dock': (8.5, 4.0, 1.57)},
-            '3': {'approach': (0.0, 7.5, 3.14), 'dock': (0.0, 8.5, 3.14)}
+            '1': {'approach': (8.0, 0.0, 0.0), 'dock': (9.5, 0.0, 1.57)},
+            '2': {'approach': (8.0, 4.0, 0.0), 'dock': (9.5, 4.0, 1.57)},
+            '3': {'approach': (0.0, 8.0, 1.57), 'dock': (0.0, 9.5, 3.14)}
         }
 
+        # --- KHỞI TẠO BỘ ĐỌC TỌA ĐỘ BẢN ĐỒ (TF2) ---
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
 
@@ -54,8 +54,9 @@ class AutoDockingNode(Node):
         self.dt = 0.1 
         self.timer = self.create_timer(self.dt, self.pid_control_loop)
         
-        self.get_logger().info("Ready")
-
+        self.get_logger().info("===============================================")
+        self.get_logger().info("🚀 DOCKING PRO: ĐÃ NÂNG CẤP ĐỊNH VỊ MAP THỰC!")
+        self.get_logger().info("===============================================")
         
         threading.Thread(target=self.terminal_input_loop, daemon=True).start()
 
@@ -70,7 +71,7 @@ class AutoDockingNode(Node):
         appr_x, appr_y, appr_yaw = self.stations[station_id]['approach']
         self.goal_x, self.goal_y, self.goal_yaw = self.stations[station_id]['dock'] 
 
-        self.get_logger().info(f"Đi tới Điểm chờ Trạm {station_id} (Đã lùi ra xa an toàn)...")
+        self.get_logger().info(f"📍 Lệnh khởi hành: Đi tới Trạm {station_id}...")
         
         goal_msg = NavigateToPose.Goal()
         goal_msg.pose.header.frame_id = 'map'
@@ -99,26 +100,28 @@ class AutoDockingNode(Node):
     def nav2_result_callback(self, future):
         status = future.result().status
         if status == GoalStatus.STATUS_SUCCEEDED:
-            self.get_logger().info('Tới điểm chờ thành công! Bắt đầu trượt lùi chuồng...')
+            self.get_logger().info('✅ Nav2 hoàn thành! Bật hệ thống lùi chuồng PID...')
             self.state = "PID_DOCKING"
             self.pid_step = 0 
             self.sum_err_x, self.sum_err_y = 0.0, 0.0 
             self.current_vx, self.current_vy, self.current_vz = 0.0, 0.0, 0.0
         else:
-            self.get_logger().error(f'Nav2 TỪ CHỐI TIẾP TỤC. HỦY LỆNH SẠC!')
+            self.get_logger().error(f'❌ Nav2 TỪ CHỐI TIẾP TỤC. HỦY LỆNH SẠC!')
             self.state = "IDLE"
 
     def pid_control_loop(self):
         if self.state != "PID_DOCKING" or self.goal_x is None:
             return
 
+        # --- LẤY TỌA ĐỘ THỰC TẾ TỪ BẢN ĐỒ (MAP) THAY VÌ ODOM ---
         try:
             trans = self.tf_buffer.lookup_transform('map', 'base_footprint', rclpy.time.Time())
             self.curr_x = trans.transform.translation.x
             self.curr_y = trans.transform.translation.y
             q = trans.transform.rotation
             self.curr_yaw = euler_from_quaternion(q.x, q.y, q.z, q.w)
-        except Exception:
+        except Exception as e:
+            # Nếu chưa đọc được (máy lag), bỏ qua chu kỳ này
             return
 
         Kp = self.get_parameter('Kp').get_parameter_value().double_value
@@ -135,61 +138,44 @@ class AutoDockingNode(Node):
 
         target_vx, target_vy, target_vz = 0.0, 0.0, 0.0
 
+        # QUY TRÌNH 3 BƯỚC (DÙNG TỌA ĐỘ MAP SIÊU CHUẨN)
         if self.pid_step == 0:
             if abs(dyaw) > 0.01: 
                 target_vz = np.clip(2.0 * dyaw, -0.2, 0.2)
             else:
-                self.pid_step = 1 # Chuyển sang trượt đa hướng
+                self.get_logger().info("📐 Đã nắn thẳng góc! Bước 1: KHÓA BÁNH căn tâm...")
+                self.pid_step = 1 
                 self.sum_err_x = 0.0
-                self.sum_err_y = 0.0
 
         elif self.pid_step == 1:
-            # GỘP CHUNG X VÀ Y - SỨC MẠNH CỦA SWERVE DRIVE!
-            chua_den_dich = False
-
-            # Xử lý trục X (Tinh chỉnh sai số tiến/lùi dọc tường)
             if abs(local_dx) > 0.005: 
-                chua_den_dich = True
                 p_x = Kp * local_dx
+                self.sum_err_x = np.clip(self.sum_err_x + local_dx * self.dt, -1.0, 1.0)
                 d_x = Kd * ((local_dx - self.prev_err_x) / self.dt)
-                if abs(local_dx) < 0.2:
-                    self.sum_err_x = np.clip(self.sum_err_x + local_dx * self.dt, -0.5, 0.5)
-                    i_x = Ki * self.sum_err_x
-                else:
-                    self.sum_err_x = 0.0
-                    i_x = 0.0
-                target_vx = np.clip(p_x + i_x + d_x, -0.1, 0.1) # Rề rề cho an toàn
+                target_vx = np.clip(p_x + Ki * self.sum_err_x + d_x, -0.15, 0.15)
+                target_vy, target_vz = 0.0, 0.0 
             else:
-                target_vx = 0.0
+                self.get_logger().info("🎯 Đã ngay tâm! Bước 2: KHÓA BÁNH trượt ngang...")
+                self.pid_step = 2
+                self.sum_err_y = 0.0
 
-            # Xử lý trục Y (Nhiệm vụ TRƯỢT NGANG chính để đâm sạc)
+        elif self.pid_step == 2:
             if abs(local_dy) > 0.005:
-                chua_den_dich = True
                 p_y = (Kp * 2.5) * local_dy   
+                self.sum_err_y = np.clip(self.sum_err_y + local_dy * self.dt, -1.0, 1.0)
                 d_y = Kd * ((local_dy - self.prev_err_y) / self.dt)
-                if abs(local_dy) < 0.2:
-                    self.sum_err_y = np.clip(self.sum_err_y + local_dy * self.dt, -0.5, 0.5)
-                    i_y = Ki * self.sum_err_y
-                else:
-                    self.sum_err_y = 0.0
-                    i_y = 0.0
-                target_vy = np.clip(p_y + i_y + d_y, -0.1, 0.1) # Rề rề trượt ngang
+                target_vy = np.clip(p_y + Ki * self.sum_err_y + d_y, -0.2, 0.2)
+                target_vx, target_vz = 0.0, 0.0 
             else:
-                target_vy = 0.0
-
-            target_vz = 0.0 # Khóa góc không cho xoay bậy bạ lúc đang đâm sạc
-
-            # Kiểm tra xem cả X và Y đều đã đạt < 5mm chưa?
-            if not chua_den_dich:
                 self.cmd_pub.publish(Twist()) 
-                self.get_logger().info("HẾT HỒN CHƯA:)) CẮM SẠC THÀNH CÔNG!")
+                self.get_logger().info("🔋 ĐÃ CẮM SẠC THÀNH CÔNG! ĐANG SẠC PIN...")
                 self.state = "IDLE"
                 return
 
         self.prev_err_x = local_dx
         self.prev_err_y = local_dy
 
-        max_accel = 0.015 
+        max_accel = 0.015
         self.current_vx += np.clip(target_vx - self.current_vx, -max_accel, max_accel)
         self.current_vy += np.clip(target_vy - self.current_vy, -max_accel, max_accel)
         self.current_vz += np.clip(target_vz - self.current_vz, -max_accel, max_accel)

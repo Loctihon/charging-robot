@@ -2,7 +2,6 @@
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 #include <trajectory_msgs/msg/joint_trajectory_point.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
-#include <geometry_msgs/msg/twist.hpp>
 #include <Eigen/Dense>
 #include <vector>
 #include <cmath>
@@ -29,22 +28,23 @@ const double a_dh[6] = {0, a2_val, a3_val, 0, 0, 0};
 const double d_dh[6] = {d1_val, 0, 0, d4_val, d5_val, d6_val};
 const double alph[6] = {M_PI/2, 0, 0, M_PI/2, -M_PI/2, 0};
 
-// ─── Cấu hình cố định ────────────────────────────────────────────────────────
-static constexpr double FIXED_Z     = -0.18;
-static constexpr double FIXED_ROLL  = M_PI;
-static constexpr double FIXED_PITCH = 0.0;
-static constexpr double FIXED_YAW   = (M_PI * 3) / 2;
-static constexpr double OFFSET_X    = 0.0025;  
-static constexpr double OFFSET_Y    = -0.03; 
-static constexpr double OFFSET_Z    = -0.01; 
+// ─── Configurable offsets ─────────────────────────────────────────────────────
+// XYZ offset is added on top of the position received from
+// /circle_detector/socket_pose_tool0 to get the final IK target.
+// RPY is now fixed (orientation from socket_pose_tool0 is not used/trusted —
+// its quaternion is not mathematically valid, see circle_detector_node).
+static constexpr double OFFSET_X     = 0;
+static constexpr double OFFSET_Y     = 0;
+static constexpr double OFFSET_Z     = 0;
+static constexpr double FIXED_ROLL   = M_PI;
+static constexpr double FIXED_PITCH  = 0.0;
+static constexpr double FIXED_YAW    = (3.0 * M_PI) / 2.0;
 
-static constexpr double OFFSET_R    = 0.0; 
-static constexpr double OFFSET_P    = 0.0; 
-static constexpr double OFFSET_Yaw    = 0.0; 
+// Phase 1 (approach) / Phase 3 (retreat) back off this much along X from
+// the captured socket X, before/after Phase 2 (plug in) goes to full X.
+static constexpr double APPROACH_OFFSET_X = -0.25;
 
-static constexpr double DRIVE_VX    = 0.3;
-static constexpr int    DRIVE_MS    = 1500;
-static constexpr int    ARM_WAIT_S  = 4;      
+static constexpr int ARM_WAIT_S = 4;
 
 // ─── IK helpers ──────────────────────────────────────────────────────────────
 template <typename T> int sgn(T val) {
@@ -91,9 +91,9 @@ Matrix4d get_t_matrix(double x, double y, double z, double r, double p, double y
           0, sin(r),  cos(r), 0,
           0,      0,       0, 1;
     Ry << cos(p), 0, sin(p), 0,
-              0,  1,      0, 0,
-        -sin(p),  0, cos(p), 0,
-              0,  0,      0, 1;
+               0,  1,      0, 0,
+         -sin(p),  0, cos(p), 0,
+               0,  0,      0, 1;
     Rz << cos(yaw), -sin(yaw), 0, 0,
           sin(yaw),  cos(yaw), 0, 0,
                  0,         0, 1, 0,
@@ -186,14 +186,13 @@ vector<double> select_best_solution(const vector<vector<double>>& solutions,
 // ─── Node ────────────────────────────────────────────────────────────────────
 class ArmTeleopNode : public rclcpp::Node {
 public:
-    ArmTeleopNode() : Node("arm_ik_teleop_node_cpp"),
-                      y_captured_(false),
-                      waiting_for_y_(false)
+    ArmTeleopNode()
+    : Node("arm_ik_teleop_node_cpp"),
+      pose_captured_(false),
+      waiting_for_pose_(false)
     {
         traj_pub_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
             "/joint_trajectory_controller/joint_trajectory", 10);
-        cmd_vel_pub_ = this->create_publisher<geometry_msgs::msg::Twist>(
-            "/cmd_vel", 10);
 
         joint_names_ = {
             "ur10_shoulder_pan_joint", "ur10_shoulder_lift_joint",
@@ -201,9 +200,10 @@ public:
             "ur10_wrist_2_joint",      "ur10_wrist_3_joint"
         };
 
-        // Sub sẵn nhưng chỉ lưu Y khi được yêu cầu
+        // Subscribe directly to the tool0-remapped socket pose. No TF lookup
+        // needed anymore — we only use its xyz.
         socket_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
-            "/circle_detector/socket_pose", 10,
+            "/circle_detector/socket_pose_tool0", 10,
             std::bind(&ArmTeleopNode::socket_callback, this, std::placeholders::_1));
 
         input_thread_ = std::thread(&ArmTeleopNode::input_loop, this);
@@ -217,43 +217,59 @@ public:
 
 private:
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr traj_pub_;
-    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr             cmd_vel_pub_;
     rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr    socket_sub_;
     vector<string> joint_names_;
     std::thread    input_thread_;
 
-    std::mutex              y_mutex_;
-    std::condition_variable y_cv_;
-    double                  captured_y_;
-    bool                    y_captured_;
-    bool                    waiting_for_y_;
+    std::mutex              pose_mutex_;
+    std::condition_variable pose_cv_;
+    // Captured values (xyz from socket_pose_tool0 + fixed offset; rpy fixed)
+    double captured_x_,   captured_y_,   captured_z_;
+    double captured_roll_, captured_pitch_, captured_yaw_;
+    bool   pose_captured_;
+    bool   waiting_for_pose_;
 
-    // ── Callback: chỉ lưu Y khi đang chờ, rồi dừng ──────────────────────────
+    // ── Callback: capture xyz from socket_pose_tool0, rpy stays fixed ────────
     void socket_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
-        std::lock_guard<std::mutex> lock(y_mutex_);
-        if (!waiting_for_y_ || y_captured_) return;  // không cần nữa
+        std::lock_guard<std::mutex> lock(pose_mutex_);
+        if (!waiting_for_pose_ || pose_captured_) return;
 
-        captured_y_ = -(msg->pose.position.y) + OFFSET_Y;
-        y_captured_ = true;
+        // xyz straight from the topic + fixed offset. No TF transform.
+        captured_x_ = msg->pose.position.x + OFFSET_X;
+        captured_y_ = msg->pose.position.y + OFFSET_Y;
+        captured_z_ = msg->pose.position.z + OFFSET_Z;
+
+        // rpy stays fixed — orientation from socket_pose_tool0 is not used.
+        captured_roll_  = FIXED_ROLL;
+        captured_pitch_ = FIXED_PITCH;
+        captured_yaw_   = FIXED_YAW;
+
         RCLCPP_INFO(this->get_logger(),
-            "Đã lấy Y: raw=%.4f → used=%.4f (offset=%.4f)",
-            msg->pose.position.y, captured_y_, OFFSET_Y);
-        y_cv_.notify_one();
+            "Socket xyz from socket_pose_tool0 (+ offset):\n"
+            "  X=%.4f  Y=%.4f  Z=%.4f\n"
+            "  Roll=%.4f  Pitch=%.4f  Yaw=%.4f (fixed)",
+            captured_x_, captured_y_, captured_z_,
+            captured_roll_, captured_pitch_, captured_yaw_);
+
+        pose_captured_ = true;
+        pose_cv_.notify_one();
     }
 
-    // ── Gửi lệnh IK ──────────────────────────────────────────────────────────
-    bool move_arm(double x, double y) {
+    // ── Send IK command (6-DOF) ───────────────────────────────────────────────
+    bool move_arm(double x, double y, double z,
+                  double roll, double pitch, double yaw) {
         RCLCPP_INFO(this->get_logger(),
-            "[IK] X=%.3f  Y=%.4f  Z=%.3f", x, y, FIXED_Z);
+            "[IK] X=%.4f  Y=%.4f  Z=%.4f  Roll=%.4f  Pitch=%.4f  Yaw=%.4f",
+            x, y, z, roll, pitch, yaw);
 
-        Matrix4d T_06 = get_t_matrix(x, y, FIXED_Z, FIXED_ROLL, FIXED_PITCH, FIXED_YAW);
+        Matrix4d T_06 = get_t_matrix(x, y, z, roll, pitch, yaw);
         auto solutions = inverse_kinematics(T_06);
         if (solutions.empty()) {
             RCLCPP_ERROR(this->get_logger(), "Ngoài vùng làm việc!");
             return false;
         }
 
-        auto joints = select_best_solution(solutions, x, y, FIXED_Z);
+        auto joints = select_best_solution(solutions, x, y, z);
         if (joints.empty()) {
             RCLCPP_ERROR(this->get_logger(), "Không tìm được nghiệm hợp lệ!");
             return false;
@@ -272,24 +288,7 @@ private:
         return true;
     }
 
-    // ── Tịnh tiến ────────────────────────────────────────────────────────────
-    void drive_forward() {
-        RCLCPP_INFO(this->get_logger(),
-            "Tịnh tiến linear.x=%.1f trong %dms...", DRIVE_VX, DRIVE_MS);
-
-        auto end = std::chrono::steady_clock::now() +
-                   std::chrono::milliseconds(DRIVE_MS);
-        while (std::chrono::steady_clock::now() < end) {
-            geometry_msgs::msg::Twist tw;
-            tw.linear.x = DRIVE_VX;
-            cmd_vel_pub_->publish(tw);
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        }
-        cmd_vel_pub_->publish(geometry_msgs::msg::Twist{});
-        RCLCPP_INFO(this->get_logger(), "Dừng tịnh tiến.");
-    }
-
-    // ── Input loop: chờ "ok" từ terminal ─────────────────────────────────────
+    // ── Input loop: wait for "ok" from terminal ───────────────────────────────
     void input_loop() {
         while (rclcpp::ok()) {
             cout << "\nGõ 'ok' để bắt đầu: ";
@@ -297,16 +296,15 @@ private:
             if (!getline(cin, line)) break;
             if (line != "ok") continue;
 
-            // Bước 1: lấy Y từ topic (1 message duy nhất)
-            RCLCPP_INFO(this->get_logger(), "Chờ lấy Y từ topic...");
+            // Step 0: capture xyz from socket_pose_tool0 (once)
+            RCLCPP_INFO(this->get_logger(), "Chờ lấy pose từ topic...");
             {
-                std::unique_lock<std::mutex> lock(y_mutex_);
-                y_captured_   = false;
-                waiting_for_y_ = true;
-                // Chờ tối đa 5 giây
-                bool got = y_cv_.wait_for(lock, std::chrono::seconds(5),
-                                          [this]{ return y_captured_; });
-                waiting_for_y_ = false;
+                std::unique_lock<std::mutex> lock(pose_mutex_);
+                pose_captured_    = false;
+                waiting_for_pose_ = true;
+                bool got = pose_cv_.wait_for(lock, std::chrono::seconds(5),
+                                             [this]{ return pose_captured_; });
+                waiting_for_pose_ = false;
                 if (!got) {
                     RCLCPP_ERROR(this->get_logger(),
                         "Timeout! Không nhận được dữ liệu từ topic trong 5s.");
@@ -314,17 +312,32 @@ private:
                 }
             }
 
-            double y = captured_y_;
-            RCLCPP_INFO(this->get_logger(), "=== Bắt đầu chuỗi hành động (Y=%.4f) ===", y);
+            const double x     = captured_x_;
+            const double y     = captured_y_;
+            const double z     = captured_z_;
+            const double roll  = captured_roll_;
+            const double pitch = captured_pitch_;
+            const double yaw   = captured_yaw_;
 
-            // Bước 2: IK X=0.8
-            if (!move_arm(0.8, y)) continue;
+            const double approach_x = x + APPROACH_OFFSET_X;
 
-            // Bước 3: Tịnh tiến
-            drive_forward();
+            // Phase 1: approach — go to (x + APPROACH_OFFSET_X, y, z)
+            RCLCPP_INFO(this->get_logger(),
+                "=== Giai đoạn 1: Tiến gần X=%.4f Y=%.4f Z=%.4f ===",
+                approach_x, y, z);
+            if (!move_arm(approach_x, y, z, roll, pitch, yaw)) continue;
 
-            // Bước 4: IK X=1.0
-            move_arm(1.0, y);
+            // Phase 2: plug in — go to full (x, y, z)
+            RCLCPP_INFO(this->get_logger(),
+                "=== Giai đoạn 2: Cắm X=%.4f Y=%.4f Z=%.4f ===",
+                x, y, z);
+            if (!move_arm(x, y, z, roll, pitch, yaw)) continue;
+
+            // Phase 3: retreat — back to phase 1 position
+            RCLCPP_INFO(this->get_logger(),
+                "=== Giai đoạn 3: Lùi về X=%.4f Y=%.4f Z=%.4f ===",
+                approach_x, y, z);
+            move_arm(approach_x, y, z, roll, pitch, yaw);
 
             RCLCPP_INFO(this->get_logger(), "=== Hoàn thành ===");
         }

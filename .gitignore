@@ -10,4 +10,5 @@
 # git files
 !.gitignore
 !README.md
-!LICENSE
+!LICENSEsrc/models/VF9/meshes/VF9.dae
+src/models/VF_car/car.dae
