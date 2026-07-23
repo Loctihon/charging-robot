@@ -1,11 +1,14 @@
-#Sử dụng bộ điều khiển MPPI và thuật toán theta*
+# ==========================================================
+# NAV2 PARAMS CHUẨN CHO ROBOT DIFF DRIVE 150KG
+# ==========================================================
+
 amcl:
   ros__parameters:
     use_sim_time: True
     base_frame_id: "base_footprint"   # frame robot
     global_frame_id: "map"            # frame bản đồ
     odom_frame_id: "odom"             # frame odometry
-    scan_topic: "/scan_front"               # topic lidar
+    scan_topic: "/scan"               # topic lidar
 
     min_particles: 500
     max_particles: 2000
@@ -13,22 +16,25 @@ amcl:
     laser_max_range: 40.0
     laser_min_range: 0.05
 
-    robot_model_type: "nav2_amcl::OmniMotionModel" # robot_model_type: "nav2_amcl::DifferentialMotionModel" # <--- KHAI BÁO SAI HỆ TRUYỀN ĐỘNG!
+    robot_model_type: "nav2_amcl::DifferentialMotionModel"
 
-    alpha1: 0.1
-    alpha2: 0.1
-    alpha3: 0.1
-    alpha4: 0.1
-    alpha5: 0.1
+    alpha1: 0.2
+    alpha2: 0.2
+    alpha3: 0.2
+    alpha4: 0.2
+    alpha5: 0.2
 
     transform_tolerance: 1.0
 
+    # Auto initial pose — no manual "2D Pose Estimate" needed
     set_initial_pose: true
     initial_pose:
       x: 0.0
       y: 0.0
       z: 0.0
       yaw: 0.0
+
+
 # ==========================================================
 # CONTROLLER
 # ==========================================================
@@ -41,7 +47,6 @@ controller_server:
     controller_frequency: 20.0
 
     min_x_velocity_threshold: 0.001
-    min_y_velocity_threshold: 0.001
     min_theta_velocity_threshold: 0.001
 
     failure_tolerance: 0.3
@@ -57,8 +62,13 @@ controller_server:
 
     goal_checker:
       plugin: "nav2_controller::SimpleGoalChecker"
+<<<<<<< HEAD
+      xy_goal_tolerance: 0.25     # sai số vị trí goal
+      yaw_goal_tolerance: 0.25    # sai số góc
+=======
       xy_goal_tolerance: 0.15    # sai số vị trí goal
       yaw_goal_tolerance: 0.15    # sai số góc
+>>>>>>> origin/master
       stateful: True
 
     # -------------------------
@@ -67,12 +77,73 @@ controller_server:
 
     progress_checker:
       plugin: "nav2_controller::SimpleProgressChecker"
-      required_movement_radius: 0.1   # robot phải tiến ít nhất 0.3m
+      required_movement_radius: 0.3   # robot phải tiến ít nhất 0.3m
       movement_time_allowance: 10.0   # trong 10s
 
-  
+    # ======================================================
+    # DWB LOCAL PLANNER
+    # ======================================================
 
     FollowPath:
+<<<<<<< HEAD
+      plugin: "dwb_core::DWBLocalPlanner"
+
+      # ---------- velocity ----------
+
+      min_vel_x: 0.0
+      max_vel_x: 0.4
+
+      min_vel_y: 0.0
+      max_vel_y: 0.0
+
+      max_vel_theta: 1.2
+
+      min_speed_xy: 0.0
+      max_speed_xy: 0.4
+
+      min_speed_theta: 0.0
+
+      acc_lim_x: 1.5
+      acc_lim_theta: 2.0
+
+      decel_lim_x: -1.5
+      decel_lim_theta: -2.0
+
+      # ---------- sampling ----------
+
+      vx_samples: 20
+      vy_samples: 1
+      vtheta_samples: 20
+
+      sim_time: 2.0
+
+      # ---------- stopping ----------
+
+      trans_stopped_velocity: 0.1
+
+      # ---------- critics ----------
+
+      critics: [
+        "RotateToGoal",
+        "ObstacleFootprint",
+        "GoalAlign",
+        "PathAlign",
+        "PathDist",
+        "GoalDist"
+      ]
+
+      PathAlign.scale: 32.0
+      GoalAlign.scale: 24.0
+
+      PathDist.scale: 32.0
+      GoalDist.scale: 24.0
+
+      ObstacleFootprint.scale: 0.02
+
+      RotateToGoal.scale: 32.0
+
+
+=======
       plugin: "nav2_mppi_controller::MPPIController"
       time_steps: 60 # số bước dự đóan trong tương lai
       model_dt: 0.05 # thời gian mỗi bước, xe sẽ nhìn trước 100x0.05 = 5s, cần tăng khi xe chạy nhanh hơn
@@ -147,6 +218,7 @@ controller_server:
         cost_weight: 45.0          # Phạt các chuyển động xoay vô nghĩa khi đang đi thẳng, ép dành lực xoay cho GoalAngle
 # Robot rung lắc thì giảm temperature, vx_std
 # không bám Path thì tăng PathAlignCritic, va vật cản thì tăng ObstaclesCritic
+>>>>>>> origin/master
 # ==========================================================
 # LOCAL COSTMAP
 # ==========================================================
@@ -160,7 +232,7 @@ local_costmap:
       global_frame: odom
       robot_base_frame: base_footprint
 
-      update_frequency: 15.0
+      update_frequency: 10.0
       publish_frequency: 5.0
 
       rolling_window: true
@@ -172,21 +244,13 @@ local_costmap:
       footprint: "[[0.9,0.425],[0.9,-0.425],[-0.9,-0.425],[-0.9,0.425]]"
 
       plugins: ["obstacle_layer", "inflation_layer"]
-  
+
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
-        observation_sources: scan_front scan_rear
+        observation_sources: scan
 
-        scan_front:
-          topic: /scan_front
-          data_type: "LaserScan"
-          marking: true
-          clearing: true
-          obstacle_range: 5.0
-          raytrace_range: 6.0
-        
-        scan_rear:
-          topic: /scan_rear
+        scan:
+          topic: /scan
           data_type: "LaserScan"
           marking: true
           clearing: true
@@ -195,8 +259,8 @@ local_costmap:
 
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        inflation_radius: 1.2 # Vùng an toàn để né
-        cost_scaling_factor: 5.0
+        inflation_radius: 0.7 # Vùng an toàn để né
+        cost_scaling_factor: 3.0
 
 
 # ==========================================================
@@ -227,30 +291,31 @@ global_costmap:
 
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
-        observation_sources: scan_front scan_rear
+        observation_sources: scan
 
-        scan_front:
-          topic: /scan_front
+        scan:
+          topic: /scan
           data_type: "LaserScan"
           marking: true
           clearing: true
 
-        scan_rear:
-          topic: /scan_rear
-          data_type: "LaserScan"
-          marking: true
-          clearing: true
-          
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
+<<<<<<< HEAD
+        inflation_radius: 0.7
+        cost_scaling_factor: 3.0
+=======
         inflation_radius: 1.2 # Vùng an toàn để né
         cost_scaling_factor: 2.5
+>>>>>>> origin/master
 
 
 # ==========================================================
 # PLANNER
 # ==========================================================
 
+<<<<<<< HEAD
+=======
 # planner_server:
 #   ros__parameters:
 
@@ -264,17 +329,21 @@ global_costmap:
 #       use_astar: true
 #       allow_unknown: true
 
+>>>>>>> origin/master
 planner_server:
   ros__parameters:
+
     use_sim_time: True
-    expected_planner_frequency: 10.0
+
     planner_plugins: ["GridBased"]
 
     GridBased:
-      plugin: "nav2_theta_star_planner/ThetaStarPlanner"
-      how_many_corners: 8 # Ngó 8 hướng để tận dụng tối đa thuật toán 
-      w_heuristic: 1.0     # Trọng số (Để 1.0 là cân bằng giữa tốc độ tính toán và đường ngắn nhất)
-      use_final_approach_orientation: false # Ép xe xoay đúng góc khi tới đích
+      plugin: "nav2_navfn_planner/NavfnPlanner"
+      tolerance: 0.5
+      use_astar: false
+      allow_unknown: true
+
+
 # ==========================================================
 # BEHAVIOR
 # ==========================================================

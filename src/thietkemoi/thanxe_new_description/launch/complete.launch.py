@@ -40,14 +40,14 @@ def generate_launch_description():
         executable='spawn_entity.py',
         arguments=['-topic', 'robot_description',
                    '-entity', 'my_mobile_manipulator',
-                   '-x', '0.0', '-y', '0.0', '-z', '0.1'],
+                   '-x', '1.0', '-y', '0.5', '-z', '0.1'],
         output='screen',
         parameters=[{'use_sim_time': True}]
     )
 
 
     world_file_path = os.path.join(
-        get_package_share_directory(pkg_name), 'worlds', 'vinfast_map.world'
+        get_package_share_directory(pkg_name), 'worlds', 'pluginntest.world'
     )
 
     # 5. Include Gazebo 
@@ -125,7 +125,7 @@ def generate_launch_description():
     )
     home_dir = os.environ['HOME']
     
-    external_models_path = os.path.join(home_dir, 'new_design_ws', 'src', 'models')
+    external_models_path = os.path.join(home_dir, 'charging-robot', 'src', 'models')
     
     station_sdf_path = os.path.join(external_models_path, 'tram_sac_VF', 'model.sdf')
 
@@ -146,9 +146,7 @@ def generate_launch_description():
         package=cpp_pkg_name,
         executable='swerve_drive',
         output='screen',
-        parameters=[{'use_sim_time': True}],
-        remappings=[('/cmd_vel', '/cmd_vel_nav')] 
-        # Ép Sim Time về True tại đây
+        parameters=[{'use_sim_time': True}] # Ép Sim Time về True tại đây
     )
 
     node_depth_heatmap = Node(
@@ -161,6 +159,13 @@ def generate_launch_description():
     node_solvepnp = Node(
         package=cpp_pkg_name,
         executable='solvepnp',
+        output='screen',
+        parameters=[{'use_sim_time': True}]
+    )
+
+    node_ccs2_detector = Node(
+        package=cpp_pkg_name,
+        executable='ccs2_detector_node',
         output='screen',
         parameters=[{'use_sim_time': True}]
     )
@@ -211,8 +216,6 @@ def generate_launch_description():
         parameters=[{'use_sim_time': True}]
     )
 
-    
-
 
     # # Publish /initialpose once after 3 s so AMCL has time to start.
     # # Edit x, y, yaw to match your robot's real starting position on the map.
@@ -242,12 +245,12 @@ def generate_launch_description():
     # )
 
     return LaunchDescription([
-        # nav2_launch,
         set_gazebo_model_path,
         gazebo,
         # publish_initial_pose,
         node_robot_state_publisher,
         node_spawn_entity,
+        # node_spawn_vf9,
         load_joint_state_broadcaster,
         load_base_controllers,
         # node_spawn_station,
@@ -255,6 +258,7 @@ def generate_launch_description():
         # node_spawn_station3,
         node_swerve_drive,
         rviz,
-        # node_depth_heatmap,
-        # node_solvepnp,  
+        node_depth_heatmap,
+        node_solvepnp,
+        node_ccs2_detector,
     ])

@@ -1,0 +1,2070 @@
+<sdf version='1.7'>
+  <world name='default'>
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+    <model name='ground_plane'>
+      <static>1</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='visual'>
+          <cast_shadows>0</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <physics type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>1</shadows>
+    </scene>
+    <audio>
+      <device>default</device>
+    </audio>
+    <wind/>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>0</latitude_deg>
+      <longitude_deg>0</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+    <model name='tram_sac_VF3'>
+      <static>1</static>
+      <link name='body_link'>
+        <visual name='visual_tru'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://tram_sac_VF/meshes/tru.stl</uri>
+              <scale>0.001 0.001 0.001</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/White</name>
+            </script>
+          </material>
+        </visual>
+        <visual name='visual_cong_sac'>
+          <pose>0 0.005 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://tram_sac_VF/meshes/cong_sac.stl</uri>
+              <scale>0.001 0.001 0.001</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Black</name>
+            </script>
+          </material>
+        </visual>
+        <visual name='visual_icon'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://tram_sac_VF/meshes/icon.stl</uri>
+              <scale>0.001 0.001 0.001</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
+        <collision name='collision_tru'>
+          <pose>0 0.1 0.45 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>0.32 0.15 0.92</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <collision name='collision_cong_sac'>
+          <pose>0 0.005 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://tram_sac_VF/meshes/tramsac.stl</uri>
+              <scale>0.001 0.001 0.001</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <pose>0 10.5 0 0 -0 0</pose>
+    </model>
+    <model name='tram_sac_VF2'>
+      <static>1</static>
+      <link name='body_link'>
+        <visual name='visual_tru'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://tram_sac_VF/meshes/tru.stl</uri>
+              <scale>0.001 0.001 0.001</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/White</name>
+            </script>
+          </material>
+        </visual>
+        <visual name='visual_cong_sac'>
+          <pose>0 0.005 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://tram_sac_VF/meshes/cong_sac.stl</uri>
+              <scale>0.001 0.001 0.001</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Black</name>
+            </script>
+          </material>
+        </visual>
+        <visual name='visual_icon'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://tram_sac_VF/meshes/icon.stl</uri>
+              <scale>0.001 0.001 0.001</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
+        <collision name='collision_tru'>
+          <pose>0 0.1 0.45 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>0.32 0.15 0.92</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <collision name='collision_cong_sac'>
+          <pose>0 0.005 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://tram_sac_VF/meshes/tramsac.stl</uri>
+              <scale>0.001 0.001 0.001</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <pose>10.5 4 0 0 0 -1.57</pose>
+    </model>
+    <model name='tram_sac_VF1'>
+      <static>1</static>
+      <link name='body_link'>
+        <visual name='visual_tru'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://tram_sac_VF/meshes/tru.stl</uri>
+              <scale>0.001 0.001 0.001</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/White</name>
+            </script>
+          </material>
+        </visual>
+        <visual name='visual_cong_sac'>
+          <pose>0 0.005 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://tram_sac_VF/meshes/cong_sac.stl</uri>
+              <scale>0.001 0.001 0.001</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Black</name>
+            </script>
+          </material>
+        </visual>
+        <visual name='visual_icon'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://tram_sac_VF/meshes/icon.stl</uri>
+              <scale>0.001 0.001 0.001</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
+        <collision name='collision_tru'>
+          <pose>0 0.1 0.45 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>0.32 0.15 0.92</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <collision name='collision_cong_sac'>
+          <pose>0 0.005 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://tram_sac_VF/meshes/tramsac.stl</uri>
+              <scale>0.001 0.001 0.001</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <pose>10.5 0.2 0 0 0 -1.57</pose>
+    </model>
+    <model name='my_mobile_manipulator'>
+      <link name='base_footprint'>
+        <inertial>
+          <pose>0.013876 0 0.367142 0 -0 0</pose>
+          <mass>154.15</mass>
+          <inertia>
+            <ixx>23.1964</ixx>
+            <ixy>0</ixy>
+            <ixz>-1.30213</ixz>
+            <iyy>55.7644</iyy>
+            <iyz>0</iyz>
+            <izz>50.642</izz>
+          </inertia>
+        </inertial>
+        <collision name='base_footprint_fixed_joint_lump__base_link_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/base_link.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <collision name='base_footprint_fixed_joint_lump__base_camera_link_collision_1'>
+          <pose>0.88 0 0.8 0 0.15 0</pose>
+          <geometry>
+            <box>
+              <size>0.01 0.03 0.03</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <collision name='base_footprint_fixed_joint_lump__laser_frame_collision_2'>
+          <pose>0.95 0 0.55 0 -0 0</pose>
+          <geometry>
+            <cylinder>
+              <length>0.04</length>
+              <radius>0.05</radius>
+            </cylinder>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <collision name='base_footprint_fixed_joint_lump__ur10_base_link_inertia_collision_3'>
+          <pose>0.5 0 1 0 -0 3.14159</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>file:///home/meewoan/charging-robot/install/ur_description/share/ur_description/meshes/ur10/collision/base.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='base_footprint_fixed_joint_lump__base_link_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/base_link.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/White</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <visual name='base_footprint_fixed_joint_lump__base_camera_link_visual_1'>
+          <pose>0.88 0 0.8 0 0.15 0</pose>
+          <geometry>
+            <box>
+              <size>0.01 0.03 0.03</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Red</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <visual name='base_footprint_fixed_joint_lump__laser_frame_visual_2'>
+          <pose>0.95 0 0.55 0 -0 0</pose>
+          <geometry>
+            <cylinder>
+              <length>0.04</length>
+              <radius>0.05</radius>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Red</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <visual name='base_footprint_fixed_joint_lump__ur10_base_link_inertia_visual_3'>
+          <pose>0.5 0 1 0 -0 3.14159</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>file:///home/meewoan/charging-robot/install/ur_description/share/ur_description/meshes/ur10/visual/base.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <gravity>1</gravity>
+        <sensor name='base_camera_sensor' type='depth'>
+          <update_rate>10</update_rate>
+          <visualize>1</visualize>
+          <always_on>1</always_on>
+          <camera name='base_camera'>
+            <horizontal_fov>0.8</horizontal_fov>
+            <image>
+              <width>1280</width>
+              <height>720</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.01</near>
+              <far>40</far>
+            </clip>
+          </camera>
+          <plugin name='base_camera_controller' filename='libgazebo_ros_camera.so'>
+            <ros>
+              <namespace>base_camera</namespace>
+              <remapping>image_raw:=image_raw</remapping>
+              <remapping>camera_info:=camera_info</remapping>
+              <remapping>depth/image_raw:=depth/image_raw</remapping>
+              <remapping>depth/camera_info:=depth/camera_info</remapping>
+              <remapping>points:=points</remapping>
+            </ros>
+            <frame_name>base_camera_link_optical</frame_name>
+            <hack_baseline>0.07</hack_baseline>
+            <min_depth>0.01</min_depth>
+            <max_depth>40</max_depth>
+          </plugin>
+          <pose>0.88 0 0.8 0 0.15 0</pose>
+        </sensor>
+        <pose>0 0 0 0 -0 0</pose>
+        <sensor name='laser' type='ray'>
+          <update_rate>15</update_rate>
+          <visualize>0</visualize>
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>360</samples>
+                <min_angle>-1.57</min_angle>
+                <max_angle>1.57</max_angle>
+                <resolution>1</resolution>
+              </horizontal>
+              <vertical>
+                <samples>1</samples>
+                <min_angle>0</min_angle>
+                <max_angle>0</max_angle>
+              </vertical>
+            </scan>
+            <range>
+              <min>0.1</min>
+              <max>40</max>
+            </range>
+          </ray>
+          <plugin name='laser_controller' filename='libgazebo_ros_ray_sensor.so'>
+            <ros>
+              <argument>~/out:=scan</argument>
+            </ros>
+            <output_type>sensor_msgs/LaserScan</output_type>
+            <frame_name>laser_frame</frame_name>
+          </plugin>
+          <pose>0.95 0 0.55 0 -0 0</pose>
+        </sensor>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <linearDamping>5.0</linearDamping>
+        <angularDamping>5.0</angularDamping>
+      </link>
+      <joint name='Revolute1_to_base_link' type='revolute'>
+        <pose relative_to='base_footprint'>0.738 0.255 0.355 0 -0 0</pose>
+        <parent>base_footprint</parent>
+        <child>Revolute1_1</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <effort>10000</effort>
+            <velocity>30</velocity>
+            <lower>-1e+16</lower>
+            <upper>1e+16</upper>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='Revolute1_1'>
+        <pose relative_to='Revolute1_to_base_link'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 -0.17 0 -0 0</pose>
+          <mass>3</mass>
+          <inertia>
+            <ixx>0.0285812</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0285812</iyy>
+            <iyz>0</iyz>
+            <izz>0.0091125</izz>
+          </inertia>
+        </inertial>
+        <collision name='Revolute1_1_collision'>
+          <pose>-0.738 -0.255 -0.355 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Revolute1_1.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='Revolute1_1_visual'>
+          <pose>-0.738 -0.255 -0.355 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Revolute1_1.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Gold</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='Wheel1_to_Revolute1' type='revolute'>
+        <pose relative_to='Revolute1_1'>0 0 -0.23 0 -0 0</pose>
+        <parent>Revolute1_1</parent>
+        <child>Wheel1_1</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+            <effort>10000</effort>
+            <velocity>30</velocity>
+            <lower>-1e+16</lower>
+            <upper>1e+16</upper>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='Wheel1_1'>
+        <pose relative_to='Wheel1_to_Revolute1'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 0 1.57 -0 0</pose>
+          <mass>15</mass>
+          <inertia>
+            <ixx>0.0617188</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0617188</iyy>
+            <iyz>0</iyz>
+            <izz>0.117188</izz>
+          </inertia>
+        </inertial>
+        <collision name='Wheel1_1_collision'>
+          <pose>-0.738 -0.255 -0.125 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Wheel1_1.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>1e+06</kp>
+                <kd>20</kd>
+                <max_vel>0.5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>0.2</mu2>
+                <fdir1>1 0 0</fdir1>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='Wheel1_1_visual'>
+          <pose>-0.738 -0.255 -0.125 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Wheel1_1.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Black</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='Revolute2_to_base_link' type='revolute'>
+        <pose relative_to='base_footprint'>0.738 -0.255 0.355 0 -0 0</pose>
+        <parent>base_footprint</parent>
+        <child>Revolute2_1</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <effort>10000</effort>
+            <velocity>30</velocity>
+            <lower>-1e+16</lower>
+            <upper>1e+16</upper>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='Revolute2_1'>
+        <pose relative_to='Revolute2_to_base_link'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 -0.17 0 -0 0</pose>
+          <mass>3</mass>
+          <inertia>
+            <ixx>0.0285812</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0285812</iyy>
+            <iyz>0</iyz>
+            <izz>0.0091125</izz>
+          </inertia>
+        </inertial>
+        <collision name='Revolute2_1_collision'>
+          <pose>-0.738 0.255 -0.355 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Revolute2_1.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='Revolute2_1_visual'>
+          <pose>-0.738 0.255 -0.355 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Revolute2_1.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Gold</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='Wheel2_to_Revolute2' type='revolute'>
+        <pose relative_to='Revolute2_1'>0 0 -0.23 0 -0 0</pose>
+        <parent>Revolute2_1</parent>
+        <child>Wheel2_1</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+            <effort>10000</effort>
+            <velocity>30</velocity>
+            <lower>-1e+16</lower>
+            <upper>1e+16</upper>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='Wheel2_1'>
+        <pose relative_to='Wheel2_to_Revolute2'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 0 1.57 -0 0</pose>
+          <mass>15</mass>
+          <inertia>
+            <ixx>0.0617188</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0617188</iyy>
+            <iyz>0</iyz>
+            <izz>0.117188</izz>
+          </inertia>
+        </inertial>
+        <collision name='Wheel2_1_collision'>
+          <pose>-0.738 0.255 -0.125 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Wheel2_1.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>1e+06</kp>
+                <kd>20</kd>
+                <max_vel>0.5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>0.2</mu2>
+                <fdir1>1 0 0</fdir1>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='Wheel2_1_visual'>
+          <pose>-0.738 0.255 -0.125 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Wheel2_1.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Black</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='Revolute3_to_base_link' type='revolute'>
+        <pose relative_to='base_footprint'>-0.738 0.255 0.355 0 -0 0</pose>
+        <parent>base_footprint</parent>
+        <child>Revolute3_1</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <effort>10000</effort>
+            <velocity>30</velocity>
+            <lower>-1e+16</lower>
+            <upper>1e+16</upper>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='Revolute3_1'>
+        <pose relative_to='Revolute3_to_base_link'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 -0.17 0 -0 0</pose>
+          <mass>3</mass>
+          <inertia>
+            <ixx>0.0285812</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0285812</iyy>
+            <iyz>0</iyz>
+            <izz>0.0091125</izz>
+          </inertia>
+        </inertial>
+        <collision name='Revolute3_1_collision'>
+          <pose>0.738 -0.255 -0.355 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Revolute3_1.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='Revolute3_1_visual'>
+          <pose>0.738 -0.255 -0.355 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Revolute3_1.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Gold</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='Wheel3_to_Revolute3' type='revolute'>
+        <pose relative_to='Revolute3_1'>0 0 -0.23 0 -0 0</pose>
+        <parent>Revolute3_1</parent>
+        <child>Wheel3_1</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+            <effort>10000</effort>
+            <velocity>30</velocity>
+            <lower>-1e+16</lower>
+            <upper>1e+16</upper>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='Wheel3_1'>
+        <pose relative_to='Wheel3_to_Revolute3'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 0 1.57 -0 0</pose>
+          <mass>15</mass>
+          <inertia>
+            <ixx>0.0617188</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0617188</iyy>
+            <iyz>0</iyz>
+            <izz>0.117188</izz>
+          </inertia>
+        </inertial>
+        <collision name='Wheel3_1_collision'>
+          <pose>0.738 -0.255 -0.125 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Wheel3_1.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>1e+06</kp>
+                <kd>20</kd>
+                <max_vel>0.5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>0.2</mu2>
+                <fdir1>1 0 0</fdir1>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='Wheel3_1_visual'>
+          <pose>0.738 -0.255 -0.125 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Wheel3_1.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Black</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='Revolute4_to_base_link' type='revolute'>
+        <pose relative_to='base_footprint'>-0.738 -0.255 0.355 0 -0 0</pose>
+        <parent>base_footprint</parent>
+        <child>Revolute4_1</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <effort>10000</effort>
+            <velocity>30</velocity>
+            <lower>-1e+16</lower>
+            <upper>1e+16</upper>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='Revolute4_1'>
+        <pose relative_to='Revolute4_to_base_link'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 -0.17 0 -0 0</pose>
+          <mass>3</mass>
+          <inertia>
+            <ixx>0.0285812</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0285812</iyy>
+            <iyz>0</iyz>
+            <izz>0.0091125</izz>
+          </inertia>
+        </inertial>
+        <collision name='Revolute4_1_collision'>
+          <pose>0.738 0.255 -0.355 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Revolute4_1.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='Revolute4_1_visual'>
+          <pose>0.738 0.255 -0.355 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Revolute4_1.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Gold</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='Wheel4_to_Revolute4' type='revolute'>
+        <pose relative_to='Revolute4_1'>0 0 -0.23 0 -0 0</pose>
+        <parent>Revolute4_1</parent>
+        <child>Wheel4_1</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+            <effort>10000</effort>
+            <velocity>30</velocity>
+            <lower>-1e+16</lower>
+            <upper>1e+16</upper>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='Wheel4_1'>
+        <pose relative_to='Wheel4_to_Revolute4'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 0 1.57 -0 0</pose>
+          <mass>15</mass>
+          <inertia>
+            <ixx>0.0617188</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0617188</iyy>
+            <iyz>0</iyz>
+            <izz>0.117188</izz>
+          </inertia>
+        </inertial>
+        <collision name='Wheel4_1_collision'>
+          <pose>0.738 0.255 -0.125 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Wheel4_1.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>1e+07</kp>
+                <kd>20</kd>
+                <max_vel>0.5</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>0.2</mu2>
+                <fdir1>1 0 0</fdir1>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='Wheel4_1_visual'>
+          <pose>0.738 0.255 -0.125 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/Wheel4_1.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Black</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='ur10_shoulder_pan_joint' type='revolute'>
+        <pose relative_to='base_footprint'>0.5 0 1.1273 0 -0 0</pose>
+        <parent>base_footprint</parent>
+        <child>ur10_shoulder_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-6.28319</lower>
+            <upper>6.28319</upper>
+            <effort>500</effort>
+            <velocity>2.0944</velocity>
+          </limit>
+          <dynamics>
+            <damping>0</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='ur10_shoulder_link'>
+        <pose relative_to='ur10_shoulder_pan_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.021 -0.027 0 1.5708 -0 0</pose>
+          <mass>7.1</mass>
+          <inertia>
+            <ixx>0.03408</ixx>
+            <ixy>2e-05</ixy>
+            <ixz>-0.00425</ixz>
+            <iyy>0.03529</iyy>
+            <iyz>8e-05</iyz>
+            <izz>0.02156</izz>
+          </inertia>
+        </inertial>
+        <collision name='ur10_shoulder_link_collision'>
+          <pose>0 0 0 0 -0 3.14159</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>file:///home/meewoan/charging-robot/install/ur_description/share/ur_description/meshes/ur10/collision/shoulder.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='ur10_shoulder_link_visual'>
+          <pose>0 0 0 0 -0 3.14159</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>file:///home/meewoan/charging-robot/install/ur_description/share/ur_description/meshes/ur10/visual/shoulder.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='ur10_shoulder_lift_joint' type='revolute'>
+        <pose relative_to='ur10_shoulder_link'>0 0 0 1.5708 -0 0</pose>
+        <parent>ur10_shoulder_link</parent>
+        <child>ur10_upper_arm_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-6.28319</lower>
+            <upper>3.14159</upper>
+            <effort>500</effort>
+            <velocity>2.0944</velocity>
+          </limit>
+          <dynamics>
+            <damping>0</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='ur10_upper_arm_link'>
+        <pose relative_to='ur10_shoulder_lift_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>-0.232 0 0.158 0 -0 0</pose>
+          <mass>12.7</mass>
+          <inertia>
+            <ixx>0.02814</ixx>
+            <ixy>5e-05</ixy>
+            <ixz>-0.01561</ixz>
+            <iyy>0.77068</iyy>
+            <iyz>2e-05</iyz>
+            <izz>0.76943</izz>
+          </inertia>
+        </inertial>
+        <collision name='ur10_upper_arm_link_collision'>
+          <pose>0 0 0.220941 1.5708 0 -1.5708</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>file:///home/meewoan/charging-robot/install/ur_description/share/ur_description/meshes/ur10/collision/upperarm.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='ur10_upper_arm_link_visual'>
+          <pose>0 0 0.220941 1.5708 0 -1.5708</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>file:///home/meewoan/charging-robot/install/ur_description/share/ur_description/meshes/ur10/visual/upperarm.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='ur10_elbow_joint' type='revolute'>
+        <pose relative_to='ur10_upper_arm_link'>-0.612 0 0 0 -0 0</pose>
+        <parent>ur10_upper_arm_link</parent>
+        <child>ur10_forearm_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-4.71239</lower>
+            <upper>3.14159</upper>
+            <effort>300</effort>
+            <velocity>3.14159</velocity>
+          </limit>
+          <dynamics>
+            <damping>0</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='ur10_forearm_link'>
+        <pose relative_to='ur10_elbow_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>-0.3323 0 0.068 0 -0 0</pose>
+          <mass>4.27</mass>
+          <inertia>
+            <ixx>0.01014</ixx>
+            <ixy>8e-05</ixy>
+            <ixz>0.00916</ixz>
+            <iyy>0.30928</iyy>
+            <iyz>0</iyz>
+            <izz>0.30646</izz>
+          </inertia>
+        </inertial>
+        <collision name='ur10_forearm_link_collision'>
+          <pose>0 0 0.049042 1.5708 0 -1.5708</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>file:///home/meewoan/charging-robot/install/ur_description/share/ur_description/meshes/ur10/collision/forearm.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='ur10_forearm_link_visual'>
+          <pose>0 0 0.049042 1.5708 0 -1.5708</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>file:///home/meewoan/charging-robot/install/ur_description/share/ur_description/meshes/ur10/visual/forearm.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='ur10_wrist_1_joint' type='revolute'>
+        <pose relative_to='ur10_forearm_link'>-0.5723 0 0.163941 0 -0 0</pose>
+        <parent>ur10_forearm_link</parent>
+        <child>ur10_wrist_1_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-3.14159</lower>
+            <upper>3.14159</upper>
+            <effort>100</effort>
+            <velocity>3.14159</velocity>
+          </limit>
+          <dynamics>
+            <damping>0</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='ur10_wrist_1_link'>
+        <pose relative_to='ur10_wrist_1_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 -0.018 0.007 1.5708 -0 0</pose>
+          <mass>2</mass>
+          <inertia>
+            <ixx>0.00296</ixx>
+            <ixy>-1e-05</ixy>
+            <ixz>0</ixz>
+            <iyy>0.00222</iyy>
+            <iyz>-0.00024</iyz>
+            <izz>0.00258</izz>
+          </inertia>
+        </inertial>
+        <collision name='ur10_wrist_1_link_collision'>
+          <pose>0 0 -0.1149 1.5708 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>file:///home/meewoan/charging-robot/install/ur_description/share/ur_description/meshes/ur10/collision/wrist1.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='ur10_wrist_1_link_visual'>
+          <pose>0 0 -0.1149 1.5708 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>file:///home/meewoan/charging-robot/install/ur_description/share/ur_description/meshes/ur10/visual/wrist1.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='ur10_wrist_2_joint' type='revolute'>
+        <pose relative_to='ur10_wrist_1_link'>0 -0.1157 -0 1.5708 -0 0</pose>
+        <parent>ur10_wrist_1_link</parent>
+        <child>ur10_wrist_2_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-3.14159</lower>
+            <upper>3.14159</upper>
+            <effort>100</effort>
+            <velocity>3.14159</velocity>
+          </limit>
+          <dynamics>
+            <damping>0</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='ur10_wrist_2_link'>
+        <pose relative_to='ur10_wrist_2_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0.018 -0.007 -1.5708 0 0</pose>
+          <mass>2</mass>
+          <inertia>
+            <ixx>0.00296</ixx>
+            <ixy>-1e-05</ixy>
+            <ixz>0</ixz>
+            <iyy>0.00222</iyy>
+            <iyz>-0.00024</iyz>
+            <izz>0.00258</izz>
+          </inertia>
+        </inertial>
+        <collision name='ur10_wrist_2_link_collision'>
+          <pose>0 0 -0.1158 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>file:///home/meewoan/charging-robot/install/ur_description/share/ur_description/meshes/ur10/collision/wrist2.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='ur10_wrist_2_link_visual'>
+          <pose>0 0 -0.1158 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>file:///home/meewoan/charging-robot/install/ur_description/share/ur_description/meshes/ur10/visual/wrist2.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='ur10_wrist_3_joint' type='revolute'>
+        <pose relative_to='ur10_wrist_2_link'>0 0.0922 -0 -1.5708 0 0</pose>
+        <parent>ur10_wrist_2_link</parent>
+        <child>ur10_wrist_3_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-3.14159</lower>
+            <upper>3.14159</upper>
+            <effort>100</effort>
+            <velocity>3.14159</velocity>
+          </limit>
+          <dynamics>
+            <damping>0</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='ur10_wrist_3_link'>
+        <pose relative_to='ur10_wrist_3_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 -0.001025 -0.003511 0 -0 0</pose>
+          <mass>3.415</mass>
+          <inertia>
+            <ixx>0.0101836</ixx>
+            <ixy>1.47731e-18</ixy>
+            <ixz>6.20415e-19</ixz>
+            <iyy>0.00662089</iyy>
+            <iyz>-0.000162712</iyz>
+            <izz>0.00646266</izz>
+          </inertia>
+        </inertial>
+        <collision name='ur10_wrist_3_link_collision'>
+          <pose>0 0 -0.0922 1.5708 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>file:///home/meewoan/charging-robot/install/ur_description/share/ur_description/meshes/ur10/collision/wrist3.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <collision name='ur10_wrist_3_link_fixed_joint_lump__Charge_link_collision_1'>
+          <pose>0 0 0 3.14159 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.00099 0.00099 0.00099</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/dausac.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <collision name='ur10_wrist_3_link_fixed_joint_lump__arm_camera_link_collision_2'>
+          <pose>0 -0.07 -0.05 -3.14159 -0.174533 -1.5708</pose>
+          <geometry>
+            <box>
+              <size>0.01 0.03 0.03</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='ur10_wrist_3_link_visual'>
+          <pose>0 0 -0.0922 1.5708 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>file:///home/meewoan/charging-robot/install/ur_description/share/ur_description/meshes/ur10/visual/wrist3.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <visual name='ur10_wrist_3_link_fixed_joint_lump__Charge_link_visual_1'>
+          <pose>0 0 0 3.14159 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/meshes/dausac.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Gold</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <visual name='ur10_wrist_3_link_fixed_joint_lump__arm_camera_link_visual_2'>
+          <pose>0 -0.07 -0.05 -3.14159 -0.174533 -1.5708</pose>
+          <geometry>
+            <box>
+              <size>0.01 0.03 0.03</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Red</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <sensor name='arm_camera_sensor' type='depth'>
+          <update_rate>10</update_rate>
+          <visualize>1</visualize>
+          <always_on>1</always_on>
+          <camera name='arm_camera'>
+            <horizontal_fov>0.8</horizontal_fov>
+            <image>
+              <width>1280</width>
+              <height>720</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.02</near>
+              <far>50</far>
+            </clip>
+          </camera>
+          <plugin name='arm_camera_controller' filename='libgazebo_ros_camera.so'>
+            <ros>
+              <namespace>arm_camera</namespace>
+              <remapping>image_raw:=image_raw</remapping>
+              <remapping>camera_info:=camera_info</remapping>
+              <remapping>depth/image_raw:=depth/image_raw</remapping>
+              <remapping>depth/camera_info:=depth/camera_info</remapping>
+              <remapping>points:=points</remapping>
+            </ros>
+            <frame_name>arm_camera_link_optical</frame_name>
+            <hack_baseline>0.07</hack_baseline>
+            <min_depth>0.02</min_depth>
+            <max_depth>50</max_depth>
+          </plugin>
+          <pose>0 -0.07 -0.05 -3.14159 -0.174533 -1.5708</pose>
+        </sensor>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <static>0</static>
+      <plugin name='gazebo_ros2_control' filename='libgazebo_ros2_control.so'>
+        <parameters>/home/meewoan/charging-robot/install/thanxe_new_description/share/thanxe_new_description/config/combine_controller.yaml</parameters>
+      </plugin>
+      <pose>0 0 0.1 0 -0 0</pose>
+    </model>
+    <model name='ev_charging_port'>
+      <static>1</static>
+      <link name='car_body'>
+        <pose>0 0 0 0 -0 0</pose>
+        <visual name='car_body_visual'>
+          <geometry>
+            <mesh>
+              <uri>model://VF9/meshes/VF9.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <link name='charging_port'>
+        <pose>0 0 0 0 -0 0</pose>
+        <visual name='charging_port_visual'>
+          <geometry>
+            <mesh>
+              <uri>model://VF9/meshes/ccs2.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='charging_port_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://VF9/meshes/ccs2.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>20</max_contacts>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <link name='cover'>
+        <pose>0 0 0 0 -0 0</pose>
+        <visual name='cover_visual'>
+          <geometry>
+            <mesh>
+              <uri>model://VF9/meshes/cover.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='cover_collision'>
+          <pose>3.58835 -4.12546 1.65173 0 -0.150132 0.061567</pose>
+          <geometry>
+            <box>
+              <size>0.0108 0.166 0.239</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <collide_without_contact>1</collide_without_contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <sensor name='cover_contact_sensor' type='contact'>
+          <always_on>1</always_on>
+          <update_rate>30</update_rate>
+          <contact>
+            <collision>cover_collision</collision>
+            <topic>__default_topic__</topic>
+          </contact>
+          <plugin name='cover_open_plugin' filename='libcover_open_plugin.so'>
+            <visual_scoped_name>ev_charging_port::cover::cover_visual</visual_scoped_name>
+            <ros_topic>/charging_port/cover_state</ros_topic>
+          </plugin>
+        </sensor>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <pose>4.1396 0.560629 0 0 -0 0</pose>
+    </model>
+    <light name='user_point_light_0' type='point'>
+      <pose>0.490315 1.5429 1 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <direction>0 0 -1</direction>
+    </light>
+    <state world_name='default'>
+      <sim_time>126 119000000</sim_time>
+      <real_time>127 192419961</real_time>
+      <wall_time>1783949407 153791461</wall_time>
+      <iterations>126119</iterations>
+      <model name='ev_charging_port'>
+        <pose>5.47014 -4.43548 -0 0 -0 3.12629</pose>
+        <scale>1 1 1</scale>
+        <link name='car_body'>
+          <pose>5.47014 -4.43548 -0 0 -0 3.12629</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+        <link name='charging_port'>
+          <pose>5.47014 -4.43548 -0 0 -0 3.12629</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+        <link name='cover'>
+          <pose>5.47014 -4.43548 -0 0 -0 3.12629</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='ground_plane'>
+        <pose>0 0 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose>0 0 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='my_mobile_manipulator'>
+        <pose>0.010466 0.000156 -0.001237 -5.9e-05 0.000192 -0.000345</pose>
+        <scale>1 1 1</scale>
+        <link name='Revolute1_1'>
+          <pose>0.748622 0.254927 0.353606 -4e-05 0.000192 -0.000353</pose>
+          <velocity>0.000104 -1.9e-05 9.2e-05 1.2e-05 -2.8e-05 0.001862</velocity>
+          <acceleration>-0.001342 0.001385 -0.002667 0.017119 0.003783 1.85357</acceleration>
+          <wrench>-0.004026 0.004154 -0.008 0 -0 0</wrench>
+        </link>
+        <link name='Revolute2_1'>
+          <pose>0.748446 -0.255073 0.353636 -4e-05 0.000192 -0.000353</pose>
+          <velocity>0.000103 -1.6e-05 9.3e-05 5e-06 -2.8e-05 0.001874</velocity>
+          <acceleration>-0.006105 0.00227 -0.004146 0.009901 0.003772 1.86651</acceleration>
+          <wrench>-0.018315 0.00681 -0.012437 0 -0 0</wrench>
+        </link>
+        <link name='Revolute3_1'>
+          <pose>-0.727378 0.255435 0.353889 -5.3e-05 0.000192 -0.000338</pose>
+          <velocity>0.000104 -2.5e-05 5.2e-05 -1e-06 -3.9e-05 0.001847</velocity>
+          <acceleration>0.00072 0.004697 0.003353 0.003598 -0.007286 1.83877</acceleration>
+          <wrench>0.002159 0.01409 0.01006 0 -0 0</wrench>
+        </link>
+        <link name='Revolute4_1'>
+          <pose>-0.727554 -0.254563 0.353921 -3.2e-05 0.000192 -0.000327</pose>
+          <velocity>9.5e-05 -1.2e-05 4.9e-05 -3.1e-05 -2.8e-05 0.002341</velocity>
+          <acceleration>-0.014136 0.012624 -0.001214 -0.026116 0.003837 2.33298</acceleration>
+          <wrench>-0.042408 0.037873 -0.003642 0 -0 0</wrench>
+        </link>
+        <link name='Wheel1_1'>
+          <pose>0.748578 0.254916 0.123606 -2.9e-05 0.000471 -0.000353</pose>
+          <velocity>0.000111 -1.6e-05 9.2e-05 4.4e-05 0.000133 0.001881</velocity>
+          <acceleration>-0.001338 0.001971 -0.002644 0.048395 0.164736 1.87332</acceleration>
+          <wrench>-0.020065 0.029565 -0.039664 0 -0 0</wrench>
+        </link>
+        <link name='Wheel2_1'>
+          <pose>0.748402 -0.255084 0.123636 -2.9e-05 0.004082 -0.000354</pose>
+          <velocity>0.00011 -1.5e-05 9.3e-05 4.3e-05 0.000119 0.001895</velocity>
+          <acceleration>-0.006103 0.002888 -0.003531 0.047264 0.150645 1.88708</acceleration>
+          <wrench>-0.091547 0.043314 -0.052972 0 -0 0</wrench>
+        </link>
+        <link name='Wheel3_1'>
+          <pose>-0.727422 0.255423 0.123889 -4.2e-05 -0.008096 -0.000337</pose>
+          <velocity>0.00011 -2.3e-05 5.1e-05 4.2e-05 0.000129 0.001884</velocity>
+          <acceleration>-0.002016 0.006488 0.002961 0.046432 0.160529 1.87653</acceleration>
+          <wrench>-0.030247 0.097327 0.044412 0 -0 0</wrench>
+        </link>
+        <link name='Wheel4_1'>
+          <pose>-0.727598 -0.254572 0.12392 -2.7e-05 -0.015248 -0.000327</pose>
+          <velocity>0.000102 -1.6e-05 4.9e-05 5e-06 -0.000104 0.002303</velocity>
+          <acceleration>-0.014408 0.013691 -0.001573 0.009047 -0.072253 2.29535</acceleration>
+          <wrench>-0.216115 0.205364 -0.023602 0 -0 0</wrench>
+        </link>
+        <link name='base_footprint'>
+          <pose>0.010466 0.000156 -0.001237 -5.9e-05 0.000192 -0.000345</pose>
+          <velocity>0.000113 -2.3e-05 7.3e-05 -5e-06 -2.8e-05 -2e-06</velocity>
+          <acceleration>-0.003994 0.00116 0.000452 -0.00053 0.003738 -0.009516</acceleration>
+          <wrench>-0.615727 0.178801 0.069619 0 -0 0</wrench>
+        </link>
+        <link name='ur10_forearm_link'>
+          <pose>0.512196 8.4e-05 1.73796 -1.54376 1.56935 -3.10765</pose>
+          <velocity>0.000105 -1.5e-05 8.8e-05 -6e-06 0.000166 2.2e-05</velocity>
+          <acceleration>0.108728 -0.001657 -0.000704 0.00082 0.192651 0.237055</acceleration>
+          <wrench>0.464267 -0.007076 -0.003007 0 -0 0</wrench>
+        </link>
+        <link name='ur10_shoulder_link'>
+          <pose>0.510682 5e-05 1.12597 -6.4e-05 0.000198 0.006905</pose>
+          <velocity>8.1e-05 -1.9e-05 8.7e-05 -4e-06 -2.9e-05 2.1e-05</velocity>
+          <acceleration>-0.000804 -0.00271 -0.001329 0.000316 0.002771 0.012931</acceleration>
+          <wrench>-0.005708 -0.01924 -0.009435 0 -0 0</wrench>
+        </link>
+        <link name='ur10_upper_arm_link'>
+          <pose>0.510682 5e-05 1.12597 -1.55485 1.56832 -3.11874</pose>
+          <velocity>8.1e-05 -1.8e-05 8.8e-05 -6e-06 4e-05 2e-05</velocity>
+          <acceleration>0.016961 -0.002329 -0.000563 0.000582 0.079403 0.380077</acceleration>
+          <wrench>0.215405 -0.029573 -0.007152 0 -0 0</wrench>
+        </link>
+        <link name='ur10_wrist_1_link'>
+          <pose>0.514156 -0.163826 2.31027 -1.57075 0.006328 -3.13469</pose>
+          <velocity>0.000204 -1.3e-05 8.8e-05 4e-06 -0.002502 2.2e-05</velocity>
+          <acceleration>0.113192 -0.002338 -0.001121 -3.13963 -0.266635 -3.09228</acceleration>
+          <wrench>0.226383 -0.004675 -0.002242 0 -0 0</wrench>
+        </link>
+        <link name='ur10_wrist_2_link'>
+          <pose>0.513423 -0.163827 2.42597 -6e-06 0.006328 -3.14065</pose>
+          <velocity>-8.5e-05 -1.5e-05 8.7e-05 3.1e-05 -0.002501 0.000593</velocity>
+          <acceleration>-0.100475 -0.00498 -0.003099 -3.10226 -0.731385 -3.08421</acceleration>
+          <wrench>-0.200951 -0.009961 -0.006198 0 -0 0</wrench>
+        </link>
+        <link name='ur10_wrist_3_link'>
+          <pose>0.513511 -0.256027 2.42597 -1.57082 -0.000486 -3.14064</pose>
+          <velocity>-3.1e-05 -1.5e-05 8.3e-05 4.1e-05 2.7e-05 0.000593</velocity>
+          <acceleration>-0.076355 -0.005562 -0.006045 0.045217 0.059762 0.571176</acceleration>
+          <wrench>-0.260753 -0.018996 -0.020643 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='tram_sac_VF1'>
+        <pose>10.5 0.2 0 0 0 -1.57</pose>
+        <scale>1 1 1</scale>
+        <link name='body_link'>
+          <pose>10.5 0.2 0 0 0 -1.57</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='tram_sac_VF2'>
+        <pose>10.5 4 0 0 0 -1.57</pose>
+        <scale>1 1 1</scale>
+        <link name='body_link'>
+          <pose>10.5 4 0 0 0 -1.57</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='tram_sac_VF3'>
+        <pose>0 10.5 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='body_link'>
+          <pose>0 10.5 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <light name='sun'>
+        <pose>0 0 10 0 -0 0</pose>
+      </light>
+      <light name='user_point_light_0'>
+        <pose>0.490315 1.5429 1 0 -0 0</pose>
+      </light>
+    </state>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>-6.3159 5.68808 6.20601 0 0.539643 -0.619807</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+  </world>
+</sdf>
