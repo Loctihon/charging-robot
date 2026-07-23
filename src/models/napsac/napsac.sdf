@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <model name="parking_slot">
+    <static>1</static>
+    <link name="lines">
+      <visual name="front_line">
+        <pose>2.5 0 0.001 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.05 3.0 0.002</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/White</name>
+          </script>
+        </material>
+      </visual>
+      <visual name="back_line">
+        <pose>-2.5 0 0.001 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.05 3.0 0.002</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/White</name>
+          </script>
+        </material>
+      </visual>
+      <visual name="left_line">
+        <pose>0 1.5 0.001 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>5 0.05 0.002</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/White</name>
+          </script>
+        </material>
+      </visual>
+      <visual name="right_line">
+        <pose>0 -1.5 0.001 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>5 0.05 0.002</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/White</name>
+          </script>
+        </material>
+      </visual>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+    </link>
+  </model>
+</sdf>

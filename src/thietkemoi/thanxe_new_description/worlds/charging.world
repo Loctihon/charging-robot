@@ -1,0 +1,82 @@
+<?xml version="1.0" ?>
+<sdf version='1.7'>
+  <world name='vinfast_autonomous_charging'>
+    
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+    
+    <light name='my_point_light' type='point'>
+      <pose>-5 0 3 0 0 0</pose>
+      <diffuse>0.5 0.5 0.5 1.0</diffuse>
+      <attenuation><range>20</range><constant>0.5</constant></attenuation>
+    </light>
+
+    <gravity>0 0 -9.8</gravity>
+    <physics type='ode'>
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+
+    <include>
+      <uri>model://black_ground</uri>
+      <name>black_ground_plane</name>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+
+    <include> <uri>model://grey_wall</uri> <name>grey_wall</name> <pose>0 9.9 0 0 0 0</pose> </include>
+    <include> <uri>model://grey_wall_11m</uri> <name>grey_wall_clone_1</name> <pose>-9.9 15.3 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://grey_wall_35m</uri> <name>grey_wall_clone_4</name> <pose>-8 -10.1 0 0 0 0</pose> </include>
+    <include> <uri>model://grey_wall_7_1m</uri> <name>grey_wall_clone_5</name> <pose>9.9 6.45 0 0 0 1.5707</pose> </include>
+
+    <include> <uri>model://line_15m</uri> <name>white_line</name> <pose>-1e-06 -2.94987 0.005 0 0 0</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0</name> <pose>-3.05 -5.5 0.005 0 0 1.57074</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_1</name> <pose>2.95 5.49975 0.005 0 0 1.57074</pose> </include>
+    
+    <model name='parking_slot_1'>
+      <pose>11 0.7 0 0 -0 1.57</pose>
+      <include><uri>model://parking_slot</uri></include>
+    </model>
+    <model name='parking_slot_2'>
+      <pose>11 4.7 0 0 -0 1.57</pose>
+      <include><uri>model://parking_slot</uri></include>
+    </model>
+
+    <include> <uri>model://car_008</uri> <name>car_1</name> <pose>-7.5 -5.5 0 0 0 1.57</pose> </include>
+    <include> <uri>model://car_018</uri> <name>car_2</name> <pose>-4.5 -5.5 0.6 0 0 3.14</pose> </include>
+    <include> <uri>model://car_008</uri> <name>car_3</name> <pose>-1.5 -5.5 0 0 0 1.57</pose> </include>
+    <include> <uri>model://car_008</uri> <name>car_4</name> <pose>1.5 -5.5 0 0 0 1.57</pose> </include>
+    <include> <uri>model://car_019</uri> <name>car_5</name> <pose>4.5 -5.5 0.65 0 0 0</pose> </include>
+    <include> <uri>model://car_008</uri> <name>car_6</name> <pose>7.5 -5.5 0 0 0 1.57</pose> </include>
+    
+    <include> <uri>model://car_008</uri> <name>car_7</name> <pose>7.5 5.5 0 0 0 -1.57</pose> </include>
+    <include> <uri>model://car_008</uri> <name>car_9</name> <pose>1.5 5.5 0 0 0 -1.57</pose> </include>
+    <include> <uri>model://car_opel</uri> <name>car_10</name> <pose>-1.5 5.5 0.8 0 0 3.14</pose> </include>
+    <include> <uri>model://car_008</uri> <name>car_11</name> <pose>-4.5 5.5 0 0 0 -1.57</pose> </include>
+    <include> <uri>model://car_008</uri> <name>car_12</name> <pose>-7.5 5.5 0 0 0 -1.57</pose> </include>
+
+    <include> <uri>model://car_lexus</uri> <name>car_8_target_ev</name> <pose>4.5 5.5 0 0 0 3.14</pose> </include>
+
+    <model name='charging_port_marker'>
+      <static>1</static>
+      <pose>4.5 6.5 0.7 0 0 0</pose> 
+      <link name='link'>
+        <visual name='visual'>
+          <geometry><box><size>0.1 0.1 0.1</size></box></geometry>
+          <material>
+            <ambient>0 0 1 1</ambient> <diffuse>0 0 1 1</diffuse>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <geometry><box><size>0.1 0.1 0.1</size></box></geometry>
+        </collision>
+      </link>
+    </model>
+
+  </world>
+</sdf>

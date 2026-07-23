@@ -33,6 +33,14 @@ public:
     this->declare_parameter("Kp", 1.0);
     this->declare_parameter("Ki", 0.05);
     this->declare_parameter("Kd", 0.1);
+    AutoDockingNode() : Node("auto_docking_node", rclcpp::NodeOptions().parameter_overrides({{"use_sim_time", true}})) {
+        
+        nav_client_ = rclcpp_action::create_client<Nav2Pose>(this, "navigate_to_pose");
+        
+        // ĐÃ DỌN DẸP SẠCH SẼ: Chỉ còn đúng 1 tọa độ Đích cho mỗi trạm (x, y, yaw)
+        stations_["1"] = {-8.0, 0.0, 1.57};  
+        stations_["2"] = {-8.0, -4.0, 1.57};  
+        stations_["3"] = {0.0, -8.0, 3.14}; 
 
     cmd_pub_ = create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
     nav_client_ =

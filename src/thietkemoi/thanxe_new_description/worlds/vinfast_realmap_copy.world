@@ -1,0 +1,174 @@
+<?xml version="1.0" ?>
+<sdf version='1.7'>
+  <world name='default'>
+    
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.0 0.0 0.0 1</specular> 
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+    
+    <gravity>0 0 -9.8</gravity>
+    <physics type='ode'>
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+    
+    <!-- <scene>
+      <ambient>0.6 0.6 0.6 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>1</shadows> <grid>false</grid>
+      <origin_visual>false</origin_visual>
+    </scene> -->
+
+    <model name='custom_asphalt_plane'>
+      <static>true</static>
+      <pose>0 0 -0.05 0 0 0</pose> 
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size> </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode><mu>100</mu><mu2>50</mu2></ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://asphalt_plane/materials/scripts</uri>
+              <uri>model://asphalt_plane/materials/textures</uri>
+              <name>vrc/asphalt</name> </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <include> <uri>model://line_15m</uri> <name>white_line</name> <pose>-1e-06 -2.94987 0.005 0 0 -1.4e-05</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0</name> <pose>-3.05 -5.5 0.005 -4e-06 0 1.57074</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone</name> <pose>-8.95 -5.49994 0.005 -4e-06 0 1.57074</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_0</name> <pose>8.95 -5.50002 0.005 4e-06 0 1.57074</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_1</name> <pose>-6.05 -5.5 0.005 4e-06 0 1.5708</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_1_clone</name> <pose>-6.0499 5.49848 0.005 4e-06 0 1.57074</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_1_clone_0</name> <pose>-3.048 5.49833 0.005 -4e-06 0 1.57074</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_1_clone_1</name> <pose>-0.04789 5.49731 0.005 6e-06 0 1.57074</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_1_clone_2</name> <pose>2.95001 5.49975 0.005 -6e-06 0 1.57074</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_1_clone_3</name> <pose>5.95 5.49989 0.005 0 0 1.57074</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_2</name> <pose>-0.05 -5.5 0.005 -4e-06 0 1.57074</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_3</name> <pose>2.95 -5.5 0.005 4e-06 0 1.57074</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_4</name> <pose>5.95 -5.5 0.005 4e-06 0 1.57074</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone</name> <pose>-8.95001 5.4992 0.005 -1e-05 0 1.57074</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone</name> <pose>8.95 5.5 0.005 -7e-06 0 1.5708</pose> </include>
+    <include> <uri>model://line_15m</uri> <name>white_line_clone</name> <pose>-1e-06 -8.05015 0.005 -3e-06 -1e-06 -2.2e-05</pose> </include>
+    <include> <uri>model://line_15m</uri> <name>white_line_clone_0</name> <pose>0.007142 2.945 0.005 4e-06 0 0.000222</pose> </include>
+    <include> <uri>model://line_15m</uri> <name>white_line_clone_0_clone</name> <pose>0.004853 8.04967 0.005 1.2e-05 0 4.2e-05</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone_0_</name> <pose>-13.5 8.0 0.00 0 0 0</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone_0</name> <pose>-13.5 11.0 0.00 0 0 0</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone_1</name> <pose>-13.5 14.0 0.00 0 0 0</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone_2</name> <pose>-13.5 17.0 0.00 0 0 0</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone_3</name> <pose>-13.5 20.0 0.00 0 0 0</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone_4_</name> <pose>-22.45 8.0 0.00 0 0 0</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone_4</name> <pose>-22.45 11.0 0.00 0 0 0</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone_5</name> <pose>-22.45 14.0 0.00 0 0 0</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone_6</name> <pose>-22.45 17.0 0.00 0 0 0</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone_7</name> <pose>-22.45 20.0 0.00 0 0 0</pose> </include>
+    <include> <uri>model://line_10m</uri> <name>white_line_0_clone_clone_clone_8</name> <pose>-10.95 14 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_10m</uri> <name>white_line_0_clone_clone_clone_9</name> <pose>-16.05 14 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_10m</uri> <name>white_line_0_clone_clone_clone_10</name> <pose>-19.9 14 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_10m</uri> <name>white_line_0_clone_clone_clone_11</name> <pose>-25.0 14 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_12</name> <pose>-18.0 18.5 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_13</name> <pose>-18.0 16.5 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_14</name> <pose>-18.0 14.5 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_15</name> <pose>-18.0 12.5 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_16</name> <pose>-18.0 10.5 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_17</name> <pose>-18.0 8.5 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_18</name> <pose>-18.0 6.5 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_19</name> <pose>-18.0 4.5 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_20</name> <pose>-18.0 2.5 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_21</name> <pose>-18.0 0.5 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_22</name> <pose>8.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_23</name> <pose>6.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_24</name> <pose>4.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_25</name> <pose>2.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_26</name> <pose>0.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_27</name> <pose>-2.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_28</name> <pose>-4.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_29</name> <pose>-6.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_30</name> <pose>-8.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_31</name> <pose>-10.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_32</name> <pose>-12.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_33</name> <pose>-14.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_34</name> <pose>-16.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_35</name> <pose>-18.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_36</name> <pose>-20.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_37</name> <pose>-22.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line</uri> <name>white_line_0_clone_clone_clone_37_</name> <pose>-24.5 0 0 0 0 0</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone_38</name> <pose>-12.4 -5.5 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone_39</name> <pose>-15.3 -5.5 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone_40</name> <pose>-18.2 -5.5 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone_41</name> <pose>-21.1 -5.5 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_5m</uri> <name>white_line_0_clone_clone_clone_42</name> <pose>-24.0 -5.5 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_11_7m</uri> <name>white_line_0_clone_clone_clone_43</name> <pose>-18.2 -8.0 0 0 0 0</pose> </include>
+    <include> <uri>model://line_11_7m</uri> <name>white_line_0_clone_clone_clone_44</name> <pose>-18.2 -2.95 0 0 0 0</pose> </include>
+    <include> <uri>model://line_8m</uri> <name>white_line_0_clone_clone_clone_45</name> <pose>-10.67 -5.5 0 0 0 0.99</pose> </include>
+    <include> <uri>model://line_8m</uri> <name>white_line_0_clone_clone_clone_46</name> <pose>-10.67 -5.5 0 0 0 -0.99</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_47</name> <pose>-10.65 -2.8 0 0 0 0</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_48</name> <pose>-10.65 -2.0 0 0 0 0</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_49</name> <pose>-10.65 -1.2 0 0 0 0</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_50</name> <pose>-10.65 -0.4 0 0 0 0</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_51</name> <pose>-10.65 0.4 0 0 0 0</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_52</name> <pose>-10.65 1.2 0 0 0 0</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_53</name> <pose>-10.65 2.0 0 0 0 0</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_54</name> <pose>-10.65 2.8 0 0 0 0</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_55</name> <pose>-10.65 3.6 0 0 0 0</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_56</name> <pose>-10.65 4.4 0 0 0 0</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_57</name> <pose>-10.65 5.2 0 0 0 0</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_58</name> <pose>-10.65 6.0 0 0 0 0</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_59</name> <pose>-10.65 6.8 0 0 0 0</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_60</name> <pose>-10.65 7.6 0 0 0 0</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_61</name> <pose>-12.4 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_62</name> <pose>-13.2 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_63</name> <pose>-14.0 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_64</name> <pose>-14.8 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_65</name> <pose>-15.6 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_66</name> <pose>-16.4 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_67</name> <pose>-17.2 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_68</name> <pose>-18.0 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_69</name> <pose>-18.8 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_70</name> <pose>-19.6 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_71</name> <pose>-20.4 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_72</name> <pose>-21.2 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_73</name> <pose>-22.0 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_74</name> <pose>-22.8 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_75</name> <pose>-23.6 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_76</name> <pose>-24.4 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_3m</uri> <name>white_line_0_clone_clone_clone_77</name> <pose>-25.2 6.15 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_2m</uri> <name>white_line_0_clone_clone_clone_78</name> <pose>8.3 -1.45 0 0 0 0</pose> </include>
+    <include> <uri>model://line_1m</uri> <name>white_line_0_clone_clone_clone_79</name> <pose>7.5725 1.635 0 0 0 0.625</pose> </include>
+    <include> <uri>model://line_1m</uri> <name>white_line_0_clone_clone_clone_80</name> <pose>7.5725 1.265 0 0 0 -0.625</pose> </include>
+    <include> <uri>model://line_2m</uri> <name>white_line_0_clone_clone_clone_81</name> <pose>8.3 1.45 0 0 0 0</pose> </include>
+    <include> <uri>model://line_1m</uri> <name>white_line_0_clone_clone_clone_82</name> <pose>9.0395 -1.2435 0 0 0 2.435299</pose> </include>
+    <include> <uri>model://line_1m</uri> <name>white_line_0_clone_clone_clone_83</name> <pose>9.0395 -1.6561 0 0 0 -2.435299</pose> </include>
+    <include> <uri>model://line_2m</uri> <name>white_line_0_clone_clone_clone_84</name> <pose>-17.05 19.3 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_1m</uri> <name>white_line_0_clone_clone_clone_85</name> <pose>-16.843 20.04 0 0 0 -0.856699</pose> </include>
+    <include> <uri>model://line_1m</uri> <name>white_line_0_clone_clone_clone_86</name> <pose>-17.26 20.04 0 0 0 0.856699</pose> </include>
+    <include> <uri>model://line_2m</uri> <name>white_line_0_clone_clone_clone_87</name> <pose>-18.9 19.3 0 0 0 1.5707</pose> </include>
+    <include> <uri>model://line_1m</uri> <name>white_line_0_clone_clone_clone_88</name> <pose>-18.692 18.56 0 0 0 0.856699</pose> </include>
+    <include> <uri>model://line_1m</uri> <name>white_line_0_clone_clone_clone_89</name> <pose>-19.108 18.56 0 0 0 -0.856699</pose> </include>
+    
+  </world>
+</sdf>
