@@ -6,9 +6,14 @@
 
 # keep contents inside src
 !src/**
-#test
+
+# ignore models
+src/models/
+
+# ignore meshes anywhere (any depth)
+**/meshes/
+
 # git files
 !.gitignore
 !README.md
-!LICENSEsrc/models/VF9/meshes/VF9.dae
-src/models/VF_car/car.dae
+!LICENSE
